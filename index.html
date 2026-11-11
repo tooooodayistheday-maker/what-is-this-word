@@ -7,92 +7,94 @@
 <title>這個詞是什麼？</title>
 <style>
 :root{color-scheme:light;--paper:#f7f5ef;--ink:#172b29;--teal:#165c50;--rule:#ccd9d0;--soft:#e4eee6}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:1rem/1.8 system-ui,"Microsoft JhengHei",sans-serif}main,footer{width:min(940px,calc(100% - 40px));margin:auto}header{background:var(--soft);border-bottom:1px solid var(--rule);padding:clamp(40px,8vw,100px) 0 44px}header div{width:min(940px,calc(100% - 40px));margin:auto}.eyebrow,.meta{color:#395b52;font-weight:650;letter-spacing:.08em;font-size:.86rem}h1{font-size:clamp(2.7rem,8vw,6rem);line-height:1.08;letter-spacing:-.06em;margin:.2em 0}header p{max-width:38em;margin:.5em 0 0}a{color:var(--teal);text-underline-offset:.2em}a:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid #186453;outline-offset:4px}.controls{display:flex;align-items:end;gap:20px;flex-wrap:wrap;margin:34px 0 20px}.controls label{flex:1 1 250px;font-weight:650}input{width:100%;margin-top:6px;background:#fff;border:1px solid #7b9b8e;padding:12px;border-radius:8px;font:inherit;color:inherit}.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}article{background:#fff;border:1px solid var(--rule);border-radius:14px;padding:clamp(18px,4vw,32px);margin-bottom:14px;scroll-margin-top:18px}article:target{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal)}h2{font-size:clamp(1.45rem,4vw,2rem);margin:.18em 0}h2 a{color:inherit;text-decoration:none}h2 a:hover{text-decoration:underline}summary{cursor:pointer;color:var(--teal);font-weight:650;width:fit-content}section{max-width:68ch;border-top:1px solid var(--rule);margin-top:18px;padding-top:12px}h3{font-size:1.05rem;margin:0 0 6px}section p{margin:.35em 0 .85em}li a{overflow-wrap:anywhere}footer{padding:24px 0 45px}[hidden]{display:none!important}
+.categories{margin:30px 0 0}.categories h2{font-size:1rem;letter-spacing:.06em;margin:0 0 10px}.filters{display:flex;gap:8px;flex-wrap:wrap}.filters button{font:inherit;font-weight:650;color:var(--teal);background:white;border:1px solid #7b9b8e;border-radius:999px;padding:7px 13px;cursor:pointer}.filters button span{margin-left:3px;font-weight:400}.filters button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:white}.filters button:focus-visible{outline:3px solid #186453;outline-offset:3px}.categories+.controls{margin-top:18px}
 </style>
 </head>
 <body>
 <header><div><p class="eyebrow">每天認識一個詞彙</p><h1>這個詞是什麼？</h1><p>從白話解釋、生活例子到容易搞混的界線，把看過卻說不清楚的詞，慢慢弄懂。</p></div></header>
 <main>
+<div class="categories" aria-labelledby="category-title"><h2 id="category-title">按主題閱讀</h2><div class="filters" role="group" aria-label="詞彙分類"><button type="button" data-filter="all" aria-pressed="true">全部 <span>14</span></button><button type="button" data-filter="psychology" aria-pressed="false">心理與思考 <span>7</span></button><button type="button" data-filter="urban" aria-pressed="false">城市與空間 <span>2</span></button><button type="button" data-filter="digital" aria-pressed="false">數位生活 <span>1</span></button><button type="button" data-filter="society" aria-pressed="false">社會與日常 <span>2</span></button><button type="button" data-filter="design" aria-pressed="false">設計與無障礙 <span>1</span></button><button type="button" data-filter="everyday" aria-pressed="false">日常經濟 <span>1</span></button></div></div>
 <div class="controls"><label for="search">找詞彙<input id="search" type="search" placeholder="輸入詞彙、分類或關鍵字"></label><p id="count" aria-live="polite">共 14 則</p></div>
 <div id="archive">
-<article id="term-013" data-topic="隱形勞動" data-label="社會與日常">
+<article id="term-013" data-category="society">
 <div class="meta"><span>社會與日常</span><time>2026-11-11</time></div>
 <h2><a href="#term-013">隱形勞動</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>隱形勞動是指在體系運作或日常生活中持續付出心力，卻常未被正式看見、認可或給予相應報酬的實質勞動。</p><p>文獻指出，無論是照顧者跨領域協調資源，或專業者在正規職責外承擔的額外溝通，皆屬體系外的隱形付出。</p></section><section><h3>生活例子</h3><p>自編示意：家屬陪病時需自行摸索各院所程序，或職員在表定業務之外，還需私下調解多方關係與非正式需求。</p><p>這些為了填補制度缺口所消耗的跨單位奔波、消化規則與隱形溝通心力，正是未被算入正式成果的隱形勞動。</p></section><section><h3>界線與觀察</h3><p>隱形勞動不單指表面可見的跑腿代辦，更包含理解複雜規則、維持多方關係與心理調適等持續耗費的心力負擔。</p><p>日常中可觀察在特定任務完成前，是否有人默默承擔了跨系統聯繫、吸收行政斷層或維繫關係的非正式付出。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/42730573/">Invisible Navigators: Migrant Parents and the Everyday Labour of Managing Sickle Cell Disease in the UK.</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/42699014/">Boundary work in marketized parent-school relations: an insider autoethnography of teacher emotional labor in a Chinese international school.</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/Dfmi1IGo79I">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-012" data-topic="暗黑模式" data-label="數位生活">
+<article id="term-012" data-category="digital">
 <div class="meta"><span>數位生活</span><time>2026-11-10</time></div>
 <h2><a href="#term-012">暗黑模式</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3</p><p>你在使用網站或應用程式時，是否遇過儲值付款順暢無阻，但想關閉帳號或退訂時按鈕卻藏得極深？在行為科學與介面設計研究中，這常被探討為「暗黑模式」（dark patterns）或欺騙性設計。研究將暗黑模式定義為：利用線上平台的介面設計特徵影響消費者行為，使其導向有利於介面設計者的方向。學者指出，暗黑模式屬於較廣義的欺騙性使用者介面設計，與帶來有害阻力的「淤泥效應」（sludge）密切相關；宛如實體賭場利用空間動線留住顧客，線上平台也可能透過介面設計促使使用者持續停留與消費。</p></section><section><h3>生活例子</h3><p>2/3</p><p>（自編示意）以數位平台為例，使用者想提領帳戶內的少額餘額，系統卻設下繁瑣的最低提領門檻；想註銷帳號時，介面設置多道非必要的阻力；儲值或下注時，系統卻預設偏高的金額，並跳出限時倒數的急迫感提示。</p><p>文獻在整理線上平台的欺騙性設計時，歸納出幾種常見做法：包括隱藏管理工具、附帶複雜條件的優惠誘因、提領資金設最低餘額要求、關閉帳號時設置非必要阻力、設定偏高的預設值，以及催促行動的急迫性提示。研究指出，這類設計潛藏危害，可能加深消費損失，對處於脆弱狀態的族群衝擊尤為顯著。</p></section><section><h3>界線與觀察</h3><p>3/3</p><p>認識暗黑模式後，我們可以如何理解相關討論？</p><p>首先要注意概念界線。研究文獻將暗黑模式明確界定為「具有刻意欺騙意圖」的實務做法；介面帶來的負面效果並不全等於暗黑模式，即使設計者並無操縱意圖，系統仍可能因意料之外的負面後果產生盲點。</p><p>其次，數位研究的觀察並非人人適用的絕對定律。文獻指出，目前關於暗黑模式對消費者行為實際影響的實證研究仍相當有限且零散，主因是業者未公開內部數據。因此，除了提升辨識力，研究更強調未來應要求平台落實責任、提升透明度，並評估與推動以安全為優先的友善替代設計。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/41493466/">Dark patterns in online gambling: A scoping review and classification of deceptive design practices.</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/40302118/">Sludge, dark patterns and dark nudges: A taxonomy of online gambling platforms&#x27; deceptive design features.</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/39005480/">Explainability pitfalls: Beyond dark patterns in explainable AI.</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/Dfj98G2j7yj">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-011" data-topic="冒牌者現象" data-label="心理與思考">
+<article id="term-011" data-category="psychology">
 <div class="meta"><span>心理與思考</span><time>2026-11-09</time></div>
 <h2><a href="#term-011">冒牌者現象</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>你是否曾在完成任務或獲得肯定後，心裡卻浮現「我只是運氣好」或「萬一大家發現我其實沒那麼厲害怎麼辦」的焦慮？在心理學與行為科學研究中，這種心理感受被稱為「冒牌者現象」（impostor phenomenon）。</p><p>根據學術文獻定義，冒牌者現象的特徵是：即便個人本身具備相應能力，且已有客觀成就證明，依然持續感到自我懷疑，難以將成就內化為對自身能力的真實肯定。研究顯示，這種持續的不確定感會對職業認同與整體幸福感產生負面影響。 1/3</p></section><section><h3>生活例子</h3><p>在日常職場或學習情境中（自編示意），一位剛跨入新領域的員工即使表現符合期待，仍常擔心自己隨時會被看穿能力不足，因而花費加倍時間反覆檢查。</p><p>從相關研究來看，冒牌者現象會在行為與心理層面帶來具體影響。在行為模式上，個體常出現補償性的工作型態，包括隱藏真實的不確定感、過度準備（overpreparation）以及維持完美主義工作常規；在心理主觀體驗上，則常伴隨情緒困擾與認知負擔，進而降低職場幸福感。 2/3</p></section><section><h3>界線與觀察</h3><p>知道「冒牌者現象」之後可以怎麼看？首先，這是一項經過探討的正式研究概念，而非單純的流行語。值得注意的是，冒牌者現象不應被簡單歸咎為個人的心理缺點，它與組織環境脈絡密切相關。</p><p>研究發現，團隊心理安全感氛圍、支持性導師制度與建設性回饋，有助於降低冒牌者現象並提升職業認同；相對地，階級化文化、歧視或過高的組織期待則可能加劇此現象。因此，理解此概念能幫助我們將焦點從「檢討個人缺點」轉向「評估整體環境支持與溝通氛圍」。 3/3</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/42992207/">Team Psychological Safety Atmosphere and Professional Identity Among New Nurses in China: The Mediating Role of Impostor Phenomenon.</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/42984786/">Reconceptualizing the impostor phenomenon as an occupational experience: a scoping review and framework synthesis of qualitative evidence guided by the model of human occupation.</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/42981354/">Academic entitlement and student well-being: The mediating role of the impostor phenomenon.</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfhZKzFjwhj">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-010" data-topic="第三空間" data-label="城市與空間">
+<article id="term-010" data-category="urban">
 <div class="meta"><span>城市與空間</span><time>2026-11-08</time></div>
 <h2><a href="#term-010">第三空間</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3</p><p>你有沒有注意到，除了家裡和工作場所，生活中總有些地方能讓人放鬆或與人互動？在研究中，這些場所被稱為「第三空間」（third place）。</p><p>如果把住家視為第一空間、工作場所視為第二空間，第三空間就是指這兩者之外的社區場所。來源資料指出，第三空間能提供社交連結與體育活動的機會，促進公民參與、社會凝聚力與群體健康。常見的類型包含綠地、公共設施以及各類社區資源。造訪這些空間不只能支持健康老化，也為日常生活帶來不可或缺的互動契機。</p></section><section><h3>生活例子</h3><p>2/3</p><p>第三空間涵蓋豐富類型。研究中列舉的12類場所包括：咖啡館、餐廳、快餐店、雜貨店、圖書館、博物館、藝廊、電影院、休閒中心、理髮與美容院、公民與社會組織及長者中心。</p><p>（自編示意）下班後順道去雜貨店聊天，或週末到圖書館閱讀，都是生活中的典型互動。然而，研究顯示第三空間的存續正面臨挑戰。2010至2021年對美國的調查發現，2019至2021年間各類第三空間出現普遍關閉潮，且在鄉村與社會脆弱族群集中區的減少尤其嚴重。</p><p>另一項針對55至75歲中高齡者的研究則指出，較高孤獨感者更傾向造訪圖書館與社區中心；而心理健康狀況相較於地理距離，可能是影響空間可達性的更大屏障。</p></section><section><h3>界線與觀察</h3><p>3/3</p><p>了解「第三空間」後，我們可以從城市規劃與公共政策的角度重新審視周遭環境。</p><p>看待第三空間時，需兼顧使用情境、安全、無障礙設計與公共性。這些空間不單是休閒場所，更是支持社會平等與健康權益的關鍵載體。當我們思考一個社區是否宜居時，不能只看商業設施的多寡，還需留意公共基礎設施是否能公平地服務不同族群，包含高孤獨感或中高齡居民。</p><p>研究提醒我們，第三空間的可達性與分佈極具地理差異。政策制定若能改善步行的可達性與資源分配，有助於支持那些被忽視的社群，促進整體社會的公平與凝聚力。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/42843144/">Third place visiting among mid-to-older adults: a cross-classified multilevel analysis.</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/41223518/">Uneven access to essential services and amenities: Geographic disparities in &#x27;third place&#x27; availability across the United States from 2010 to 2021.</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/Dfe0ShBmqiG">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-009" data-topic="機會成本" data-label="詞彙筆記">
-<div class="meta"><span>詞彙筆記</span><time>2026-11-07</time></div>
+<article id="term-009" data-category="everyday">
+<div class="meta"><span>日常經濟</span><time>2026-11-07</time></div>
 <h2><a href="#term-009">機會成本</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3 在日常生活與工作中，我們經常需要分配有限的時間與精力。從經濟與資源分配的角度來看，「機會成本」（Opportunity Cost）指的是當我們把有限的稀缺資源投入到某項選擇時，所放棄的其他潛在價值。在正式研究中，學者提出了「道德機會成本」與「被放棄選項的機會成本損失」等概念。當組織或個人將有限的時間與注意力分配給相對低價值的作業時，那些被排擠掉的高價值照顧或替代選項，就構成了實質的機會成本損失。此概念強調在資源真實稀缺的前提下，評估決策所帶來的隱形代價。</p></section><section><h3>生活例子</h3><p>2/3 舉例來說（自編示意）：一位上班族若將整天有限的精力耗費在填寫繁瑣且效益極低的表單上，可能就無暇處理真正具創造性的核心專案。在醫療照護研究中，護理人員在有限時間內，若被要求花費大量注意力處理容易被審查的低價值工作，便會直接排擠與病患建立關係、預防性照顧或自身休息恢復的時間。另一個研究情境則是藥物審查機制，若過度偏向避免錯誤決策，而忽略偽陽性排除，就會在無形中放棄許多原本具療效的藥物開發機會，造成龐大的隱形機會成本。</p></section><section><h3>界線與觀察</h3><p>3/3 知道這個概念後，我們可以如何理解與思考？研究提醒，道德機會成本是有條件的：必須在資源真正稀缺、不同選擇的價值有顯著差異，且當前工作確實排擠了替代方案時才成立。此外，體制中常存在「可見性不對稱」——容易被稽核與量化的工作往往更容易獲得保護，而難以量化的關懷或潛在機會卻容易被忽略。因此，停止無效或低價值的做法，並不是單純的削減，而是將釋放出的能量與資源，重新倫理分配至更高價值的目標或休息恢復上，讓選擇的隱形代價得以被看見。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/42900760/">The Moral Economy of Nursing Time: Low-Value Nursing Work, Moral Opportunity Cost and Good Nursing.</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/42775453/">The Hidden Cost of QTc Assessment: A Quantitative Weight of Evidence Framework to Eliminate Structural False Positives and Restore the Lost Opportunity Cost of Abandoned Medicines.</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfcPnwzmkLb">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-008" data-topic="沉沒成本謬誤" data-label="心理與思考">
+<article id="term-008" data-category="psychology">
 <div class="meta"><span>心理與思考</span><time>2026-11-06</time></div>
 <h2><a href="#term-008">沉沒成本謬誤</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3</p><p>你是否有過這種經驗：買了不好看的電影票卻堅持坐完，或是點了過多餐點硬要吃光（自編示意）？在決策心理中，這常被稱為「沉沒成本謬誤」（sunk cost fallacy）。</p><p>此概念指當人們過去已經付出且無法收回某些資源（如金錢、時間或精力）時，即使效益遞減或回報機率極低，依然傾向持續投入或維持對該項行動的承諾。文獻指出，這種對不可逆資源的執著，使人難以單純依據未來的實際效益做決定；且先前投入金額越大，越容易誘發此傾向。</p></section><section><h3>生活例子</h3><p>2/3</p><p>沉沒成本謬誤不僅見於日常，也在專業領域被觀察到。</p><p>例如北美職業冰球聯盟（NHL）選秀研究發現，第一輪被選中的球員，無論後續在冰上的實際表現、傷病、違規罰時或球隊異動如何，獲得的比賽出場時間都顯著高於第二輪選中的球員。這顯示管理者容易因先前挹注的大筆財務承諾，給予第一輪球員更多出場機會。</p><p>此外，研究比較不同資源類型時發現，沉沒成本謬誤在「金錢」投資時最常發生，其次是「時間」，在「精力」上則相對最少。在168名參與者的實驗中，先前投入金額較大者也更容易產生此現象。</p></section><section><h3>界線與觀察</h3><p>3/3</p><p>知道沉沒成本謬誤後，在日常思考時可以如何理解？</p><p>首先需注意常見的誤解界線：許多人直覺認為此現象完全由「損失趨避」（對損失的敏感度高於獲利）所致。但相關研究透過測試發現，損失趨避與沉沒成本謬誤之間僅呈現弱負相關，顯示損失趨避並非主要或唯一的解釋因素，背後運作機制仍有待探討。</p><p>在日常自我觀察時，我們可以提醒自己分清「無法收回的過去投入」與「未來的實際效益」。特別是面對金錢決策時，由於金錢最易引發此效應，更值得冷靜思考，避免只因「不想浪費先前花掉的錢」而承擔不必要的後續成本。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/33662153/">Eliminating buyer&#x27;s remorse: An examination of the sunk cost fallacy in the National Hockey League draft.</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/32612790/">Loss Aversion as a Potential Factor in the Sunk-Cost Fallacy.</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfZqtN9n9Pf">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-007" data-topic="通用設計" data-label="設計">
-<div class="meta"><span>設計</span><time>2026-11-05</time></div>
+<article id="term-007" data-category="design">
+<div class="meta"><span>設計與無障礙</span><time>2026-11-05</time></div>
 <h2><a href="#term-007">通用設計</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3 你是否有過推行李箱走人行道斜坡特別省力，或看影片開字幕順暢理解的經驗？這些便利背後體現了「通用設計」（Universal Design）的精神。</p><p>通用設計是一套設計原則，最早源於建築與產品設計，現也應用於數位服務。其核心是讓空間、產品或服務能被所有人盡可能公平、順暢地使用，無須事後特殊改裝。它包含七大原則：公平使用、彈性使用、簡單直覺、感知資訊、容錯能力、低體力負擔，以及適當的尺寸與空間，強調初期就納入多元使用情境。</p></section><section><h3>生活例子</h3><p>2/3 通用設計的經典例子，是1970年代倡議者為輪椅使用者爭取的人行道斜坡切口（curb cuts）。這項設計不僅便利輪椅族，也讓推嬰兒車的家長與推貨車的送貨人員受惠，展現公共性與包容力。</p><p>（自編示意）小明推著滿載貨物的推車順著斜坡切口前行；同時，建築物採用寬闊平緩的斜坡入口，讓他能與使用輪椅的朋友並肩同行進入。</p><p>在數位領域，影片提供字幕讓聽障者能閱讀，也方便吵雜環境中的民眾；網站表單的容錯機制與密碼管理器支援，則能減少錯誤與認知負擔。</p></section><section><h3>界線與觀察</h3><p>3/3 觀察一個設計時，可以先問：換一種身體條件或使用情境，還能順利操作嗎？</p><p>例如站著或坐著、手上拿著東西、需要較大的活動空間，或不容易聽清楚提示聲時，是否仍能取得資訊、靠近設施並完成操作？</p><p>通用設計的原則，鼓勵我們同時考量看得懂、用得省力、操作有彈性，以及出錯時不容易造成傷害。</p><p>它追求的是讓更多人盡可能方便使用，不是只要加一個坡道，就能宣稱所有需求都已滿足。把不同使用者的情境放進設計，才是重點。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://accessibility.education.gov.uk/guidelines/universal-design">英國教育部｜通用設計七原則</a></li><li><a href="https://doit.uw.edu/brief/universal-design-of-physical-spaces/">華盛頓大學DO-IT｜實體空間的通用設計</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfXIBJEn1MC">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-006" data-topic="情緒勞動" data-label="社會與日常">
+<article id="term-006" data-category="society">
 <div class="meta"><span>社會與日常</span><time>2026-11-04</time></div>
 <h2><a href="#term-006">情緒勞動</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3 工作時，除了付出時間與體力，有時還得管理「表現出來的情緒」。</p><p>在職場研究中，情緒勞動指的是為了符合工作要求，調整自己的感受或情緒表達。</p><p>研究常區分兩種策略：</p><p>「表層演出」：心裡的感受沒改變，先調整表情、語氣等外在表現。</p><p>「深層演出」：嘗試調整內在感受，讓感受與工作要求更一致。</p><p>重點不只是有沒有微笑，而是這份情緒表現，是否成了工作的一部分。</p></section><section><h3>生活例子</h3><p>2/3 自編示意：客服接到客訴，心裡很委屈，仍維持平穩語氣協助處理。</p><p>如果只是壓住不滿、在外表維持耐心，可以用來理解表層演出；如果嘗試理解對方處境，讓自己的感受有所轉變，則接近深層演出。</p><p>這不是單憑外表就能替別人分類。同樣一句禮貌回應，背後可能有不同的感受與調整方式。</p><p>也不是所有安慰朋友、協調家務或日常心理負擔，都能直接套用這裡引用的職場研究定義。</p></section><section><h3>界線與觀察</h3><p>3/3 情緒勞動一定有害嗎？不能一概而論。</p><p>一份整合多項研究的分析發現，表層演出、感受與情緒規則不一致，與較差的身心狀態及工作態度有較強關聯；深層演出與這些指標的關聯較弱。</p><p>但相關不等於因果，也不能因此保證深層演出一定健康。</p><p>另一項研究指出，職場的表層／深層演出，與一般的情緒抑制／認知重評是相近但不完全相同的概念。討論時先說清楚工作情境與情緒要求，比把所有疲累都歸成同一個詞更準確。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/21728441/">情緒勞動的成本與效益｜統合分析（2011）</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/39177682/">情緒調節與情緒勞動的關係｜實證研究（2024）</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfV_gHpH3Xb">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-005" data-topic="達克效應" data-label="心理與思考">
+<article id="term-005" data-category="psychology">
 <div class="meta"><span>心理與思考</span><time>2026-11-03</time></div>
 <h2><a href="#term-005">達克效應</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3 覺得自己做得很好，和實際做得如何，有時是兩回事。</p><p>「達克效應」，全名「鄧寧—克魯格效應」（Dunning-Kruger effect），關注特定領域中，實際表現與自我評估的落差。</p><p>鄧寧與克魯格在1999年的研究發現：部分表現較差的受試者，明顯高估自己的表現。研究者提出的解釋是，做好一件事所需的技能，也可能是辨認自己哪裡做錯所需的技能；技能不足時，連察覺不足都可能比較困難。</p></section><section><h3>生活例子</h3><p>2/3 （自編示意：在一次邏輯與文法的小組討論中，對規則理解尚淺的成員，可能認為自己的答案非常準確，直到對答案時才發現落差。）</p><p>在原始研究中，學者針對幽默感、文法與邏輯等領域進行測試。結果顯示，得分落在倒數 25%（實際測試成績約在第 12 百分位數）的受試者，嚴重高估了自己的表現，平均評估自己的能力高達第 62 百分位數。這種落差說明了當缺乏特定領域的技能時，人們也難以精確評估自身的表現水平。這並非「越無知越自信」，而是反映出技能與自我檢視能力的關聯。</p></section><section><h3>界線與觀察</h3><p>3/3 知道這個概念後，可以怎麼看？</p><p>別把它當成「越無知越自信」的定律，也別把自信直接等同無能。網路常見的「愚昧山峰曲線」，也不是原始研究測出的學習歷程。</p><p>這些研究有特定的測驗與情境，不能只憑某人一次發言，就斷定他有達克效應。</p><p>原始研究也發現，提升技能與辨認錯誤的能力後，受試者更能看見自己的限制。與其拿它評斷別人，更有用的問題是：判斷自己做得好，依據是感覺，還是實際結果與回饋？</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/10626367/?format=pubmed">Kruger與Dunning（1999）｜原始研究摘要</a></li><li><a href="https://isr.umich.edu/news-events/news-releases/dunning-kruger-effect-scholars-win-2023-grawemeyer-award-in-psychology/">Dunning-Kruger effect scholars win 2023 Grawemeyer Award in Psychology | University of Michigan</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfR_tfvGqKY">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-004" data-topic="確認偏誤" data-label="心理與思考">
+<article id="term-004" data-category="psychology">
 <div class="meta"><span>心理與思考</span><time>2026-11-02</time></div>
 <h2><a href="#term-004">確認偏誤</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3</p><p>你有沒有發現，當我們心中先有了某種看法，似乎就更容易注意並記住符合該看法的訊息？在認知心理學研究中，這種現象被稱為「確認偏誤」（confirmation bias）。根據文獻定義，確認偏誤是指人們傾向於搜尋、解讀、偏愛或記憶能夠強化既有信念、期待或假設的資訊。此概念亦被收錄於專題偏誤目錄（Catalogue of Bias）相關研究中。當人在評估事物時接收到額外或無關的上下文背景資訊，就可能產生系統性的判斷偏誤。這是一個描述性的研究概念，說明人類心理在處理資訊時存在著自我強化的傾向。</p></section><section><h3>生活例子</h3><p>2/3</p><p>（自編示意）如果在職場上先入為主認為某位同事工作效率低落，便可能特別留意對方延遲交付的狀況，而忽視對方提早完成的工作紀錄。在專業評估領域，確認偏誤的影響更為嚴峻。例如在司法精神健康評估中，當專家接觸到額外的上下文資訊時，確認偏誤可能導致評估錯誤，甚至引發相當數量的冤獄案件。此外，評估情境中還可能結合錨定偏誤（首因效應）、對立偏誤（傾向做出有利於委任律師的意見）與觀察者偏誤，共同干擾客觀判斷。</p></section><section><h3>界線與觀察</h3><p>3/3</p><p>知道這個概念後，我們不必將所有思維習慣都視為心理問題，更不能將研究傾向寫成人人適用的定律。最新的動態印象更新研究指出，在日常生活針對社交對象（如虛擬員工）與非社交對象（如度假房屋）的評價更新中，顯著影響人們的其實是「對比偏誤」（放大新資訊與既有信念的差異），而非確認偏誤。因此，理解界線有助於我們保持一般的自我觀察，留意上下文背景資訊如何影響判斷，但不隨意替他人貼上標籤，也不需套用治療或對質句式。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/42831723/">Confirmation Bias: An Enemy of Objectivity in Forensic Mental Health Assessments - PubMed</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/42568154/">Contrast bias, not confirmation bias, shapes daily impression updating across social and non-social targets - PubMed</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/42434824/">Publication bias and confirmation bias in health-economic studies in diabetes-related foot disease? - PubMed</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfPXrj6mk8e">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-003" data-topic="敵意建築" data-label="城市與空間">
+<article id="term-003" data-category="urban">
 <div class="meta"><span>城市與空間</span><time>2026-11-01</time></div>
 <h2><a href="#term-003">敵意建築</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>1/3</p><p>走累了想找地方坐，卻發現座椅很難久坐；有些平台還裝了尖刺，讓人無法停留。這些設計，有時會被稱為「敵意建築」（hostile architecture）。</p><p>它指透過空間或設施，限制某些活動、排除某些使用者的設計策略，也常被稱為防禦性建築或排他性設計。這是城市設計與公共空間的討論概念，不是心理診斷。</p><p>問題不只在外觀好不好看，而是：誰能舒服地使用這個地方？誰被擋在外面？</p></section><section><h3>生活例子</h3><p>2/3</p><p>常被討論的例子，包括防止躺臥的座椅，以及阻止人停留的平台尖刺。這些安排可能限制無家者休息，也可能影響其他需要歇腳的人。</p><p>自編示意：有人帶長輩散步，沿途的座椅卻很難安穩坐下，原本短短一段路，變得難以完成。</p><p>不過，不能只看到扶手、隔板或欄杆，就認定是敵意建築。扶手也可能幫助長者起身，欄杆可能為了安全；用途、位置與實際影響都要一起看。</p></section><section><h3>界線與觀察</h3><p>3/3</p><p>下次經過廣場、車站或公園，可以試著問三個問題：</p><p>① 這個設計方便了誰，又讓誰更難使用？</p><p>② 它處理的是安全需求，還是把某些人趕到別處？</p><p>③ 有沒有兼顧安全、無障礙與休息需求的做法？</p><p>討論時也可以這樣說：「我想了解這項設計的用途，以及是否有更包容的替代方案。」</p><p>不是替每個設施貼標籤，而是多看見公共空間裡，不同人的使用需要。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://www.unsw.edu.au/newsroom/news/2020/08/defensive-architecture-design-its-most-hostile">Defensive architecture: design at its most hostile</a></li><li><a href="https://ndc-md.org/news-and-stories/understanding-hostile-architecture-the-cause-and-effect-of-restricting">Understanding Hostile Architecture: The Cause and Effect of Restricting Public Space | The Neighborhood Design Center</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfMygyKiX3T">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-002" data-topic="聚光燈效應" data-label="詞彙筆記">
-<div class="meta"><span>詞彙筆記</span><time>2026-10-31</time></div>
+<article id="term-002" data-category="psychology">
+<div class="meta"><span>心理與思考</span><time>2026-10-31</time></div>
 <h2><a href="#term-002">聚光燈效應</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>【每日心理詞彙】聚光燈效應 (1/3)</p><p>「聚光燈效應」（spotlight effect）是一種常見的認知偏誤。簡單來說，人們往往會過度高估他人注意到自己外表、行為、表現或無心失誤的程度，彷彿隨時有一盞聚光燈聚焦在自己身上。在學術研究中，這項現象被歸因於人們習慣以自身豐富的切身體驗作為思維錨點，卻無法充分調整視角來換位思考。研究實驗發現，無論是讓受試者穿上特定圖案的T恤，還是在團體討論中發言，受試者普遍會大幅高估同伴或旁人記住其衣服樣式或說話內容的比例。理解這個概念有助於我們客觀看待社交場合中的自我關注與評估。</p></section><section><h3>生活例子</h3><p>【每日心理詞彙】聚光燈效應 (2/3)</p><p>在日常生活中，我們常能觀察到聚光燈效應的影子：</p><p>示例一（自編示意）：在聚會中不小心倒錯飲料或穿錯衣服，便整晚焦慮不安，以為全場都在注視與議論自己。</p><p>示例二（自編示意）：在會議中發表了精心準備的觀點，預期大家會極為驚豔，事後才發現同事根本沒特別留意。</p><p>界線說明：聚光燈效應是人類常見的正常認知偏誤，並非臨床心理疾病或診斷。它聚焦於對「外在行為與外表注意力」的高估；而「透明度錯覺」則是高估他人看穿自己「內心情緒」的能力。我們應了解研究條件與概念邊界，絕不能僅憑單一行為就給真實人物貼上心理診斷標籤。</p></section><section><h3>界線與觀察</h3><p>【每日心理詞彙】聚光燈效應 (3/3)</p><p>面對聚光燈效應帶來的社交焦慮，可參考以下低風險應對建議（自編示意，僅供一般自我觀察與日常溝通，不宣稱治療功效）：</p><p>一、（自編示意）認知提醒：提醒自己聚光燈效應的存在，體會到大多數人其實都正專注於自身的目標與困擾。</p><p>二、（自編示意）反向思考：想想自己平時也很少長時間記住他人的小失誤。</p><p>三、（自編示意）幽默回應：若發生小尷尬，可用輕鬆自嘲化解並繼續話題。</p><p>安全提示：若社交壓力演變成嚴重焦慮，或情境中涉及人身威脅與不當控制，請優先考量安全並尋求專業心理諮商求助，不鼓勵盲目當面對質。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://pubmed.ncbi.nlm.nih.gov/10707330/">The spotlight effect in social judgment: an egocentric bias in estimates of the salience of one&#x27;s own actions and appearance - PubMed</a></li><li><a href="https://www.healthline.com/health/mental-health/spotlight-effect">Spotlight Effect: Definition, Examples, and Experiments</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/17166695/">The spotlight effect and the illusion of transparency in social anxiety - PubMed</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfKNugVCexS">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-001" data-topic="情緒勒索" data-label="詞彙筆記">
-<div class="meta"><span>詞彙筆記</span><time>2026-10-30</time></div>
+<article id="term-001" data-category="psychology">
+<div class="meta"><span>心理與思考</span><time>2026-10-30</time></div>
 <h2><a href="#term-001">情緒勒索</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>「你如果真的在乎我，就應該答應。」</p><p>當一個人利用恐懼、義務感或罪惡感施壓，讓你難以自由拒絕，我們常用「情緒勒索」描述這種互動。</p><p>Susan Forward 與 Donna Frazier 於1997年出版《Emotional Blackmail》，讓這個概念更廣為人知。常見的 FOG，指 Fear、Obligation、Guilt：恐懼、義務感、罪惡感。</p><p>它是描述關係互動的詞彙，不能單憑一句話替別人下精神疾病診斷。辨識時，要看對方如何面對拒絕，以及施壓是否反覆發生。</p></section><section><h3>生活例子</h3><p>以下是自編情境示例，不是判定別人的清單：</p><p>① 把答應當成愛的證明</p><p>你說今天需要休息，對方反覆說：「不陪我，就是不愛我。」</p><p>② 把過去的付出變成欠債</p><p>你拒絕不合理要求，對方就說：「我以前幫你那麼多，你怎麼能拒絕？」</p><p>③ 用懲罰迫使你改口</p><p>一有不同意見，就威脅撤回關愛，直到你照做。</p><p>但表達失望、提出需求，或說「這件事我不能接受」，本身不等於情緒勒索。重點是：有沒有留下協商空間、尊重你的選擇，還是持續用威脅與內疚逼你服從。</p></section><section><h3>界線與觀察</h3><p>① 先留一點時間</p><p>「我需要想一下，晚點再回答。」</p><p>不用在焦慮或內疚最強的時候，立刻做決定。</p><p>② 在安全前提下說清楚界線</p><p>「我知道你失望，也在乎你，但這次我不能答應。」</p><p>理解對方的感受，不代表必須接受全部要求。</p><p>③ 找人一起看具體情況</p><p>可以向可信任的親友或專業人員，討論發生了什麼、自己有哪些選擇。</p><p>若涉及威脅、限制行動或人身安全，不必急著當面說服對方，先尋求支持、規劃安全。</p><p>練習保留自己的選擇，可以從一次暫緩回答開始。</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://books.google.com/books/about/Emotional_Blackmail.html?id=6hZnAAAACAAJ">Susan Forward、Donna Frazier《Emotional Blackmail》1997年書目</a></li><li><a href="https://www.healthline.com/health/emotional-blackmail">Healthline：How to Spot and Respond to Emotional Blackmail（心理專業審閱）</a></li><li><a href="https://www.thehotline.org/resources/what-is-emotional-abuse/">National Domestic Violence Hotline：What Is Emotional Abuse</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/DfHpei5mTYQ">查看 Threads 原文 ↗</a></section></details>
 </article>
-<article id="term-000" data-topic="煤氣燈效應" data-label="心理與思考">
+<article id="term-000" data-category="psychology">
 <div class="meta"><span>心理與思考</span><time>2026-10-29</time></div>
 <h2><a href="#term-000">煤氣燈效應</a></h2>
 <details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>#煤氣燈效應</p><p>1/3｜由來：為什麼叫「煤氣燈」？</p><p>「煤氣燈效應」（Gaslighting）指一種反覆扭曲、否認現實的心理操控模式，讓人逐漸懷疑自己的記憶、感受與判斷，更依賴對方定義「事情到底怎麼發生」。</p><p>名稱來自 1938 年舞台劇《Gas Light》，後來也改編為電影，包括 1944 年的《Gaslight》。故事中，妻子察覺煤氣燈光變暗，丈夫卻否認異常，並透過其他操控使她懷疑自己。</p><p>這類互動可能出現在伴侶、家庭、朋友或職場關係中。</p><p>判斷重點是持續的互動模式與影響；單次爭執、記憶落差或一句難聽話，不足以認定是煤氣燈操控。</p></section><section><h3>生活例子</h3><p>以下是示意，不是用來判定某個人的清單：</p><p>① 否認已發生的事</p><p>反覆說「我根本沒說過，是你記錯」，不願一起核對紀錄。</p><p>② 把焦點轉成你的反應</p><p>你提出具體傷害，對方卻只說「你太敏感」「你又在小題大作」。</p><p>③ 持續貶低你的判斷</p><p>反覆暗示你記性差、想太多，讓你開始不敢相信自己的經驗。</p><p>④ 扭轉責任</p><p>把自己的傷害行為說成「都是你害我這樣」，讓你為對方的選擇負責。</p><p>⑤ 削弱外部支持</p><p>貶低你信任的人，讓你越來越難向外求證或求助。</p><p>需要留意的是：這些行為是否反覆出現，並讓你逐漸失去自主判斷與安全感，而非只看某一句話。</p></section><section><h3>界線與觀察</h3><p>① 安全地留下紀錄</p><p>記下時間、原話與事件經過，保存相關訊息。若裝置可能被查看，先考慮安全的保存方式；不必為了蒐證讓自己陷入危險。</p><p>② 向可信任的人核對</p><p>找朋友、家人、心理師或社工，討論具體發生的事，不必獨自反覆自我懷疑。</p><p>③ 在安全前提下設定界線</p><p>例如：「我記得的經過不同，我需要先停止這段對話。」不必把說服對方承認，當成唯一出口。</p><p>④ 評估是否存在威脅或控制</p><p>若涉及暴力、恐嚇或限制行動，優先與專業人員討論安全計畫，不必貿然當面攤牌。</p><p>在台灣，家庭暴力等保護議題可撥 113 諮詢；有立即人身危險先撥 110。</p><p>即使還不確定是否符合「煤氣燈」這個詞，你的不舒服也值得被認真聽見。</p></section>
@@ -105,16 +107,21 @@
 <script>
 const cards=[...document.querySelectorAll('article')],search=document.querySelector('#search');
 const entries=cards.map(card=>[card,card.textContent.toLocaleLowerCase()]);
-search.addEventListener('input',()=>{
+const filters=[...document.querySelectorAll('[data-filter]')];
+let category='all';
+function applyFilters(){
   const words=search.value.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
   let count=0;
-  for(const [card,text] of entries){card.hidden=!words.every(word=>text.includes(word));if(!card.hidden)count++}
+  for(const [card,text] of entries){card.hidden=(category!=='all'&&card.dataset.category!==category)||!words.every(word=>text.includes(word));if(!card.hidden)count++}
+  for(const button of filters)button.setAttribute('aria-pressed',String(button.dataset.filter===category));
   document.querySelector('#count').textContent='共 '+count+' 則';
   document.querySelector('#empty').hidden=count>0;
-});
+}
+search.addEventListener('input',applyFilters);
+for(const button of filters)button.addEventListener('click',()=>{category=button.dataset.filter;applyFilters()});
 function openTerm(){
   const card=cards.find(c=>'#'+c.id===location.hash);
-  if(card){if(card.hidden){search.value='';search.dispatchEvent(new Event('input'))}card.querySelector('details').open=true;card.scrollIntoView({block:'start'})}
+  if(card){if(card.hidden){search.value='';category='all';applyFilters()}card.querySelector('details').open=true;card.scrollIntoView({block:'start'})}
 }
 addEventListener('hashchange',openTerm);openTerm();
 </script>
