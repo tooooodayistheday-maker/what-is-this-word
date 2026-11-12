@@ -7,6 +7,7 @@
 <title>這個詞是什麼？</title>
 <script>
 window.dataLayer=window.dataLayer||[];
+function gtag(){window.dataLayer.push(arguments);}
 window.dataLayer.push({'gtm.start':Date.now(),event:'gtm.js'});
 </script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-TCWN35KS"></script>
@@ -114,7 +115,8 @@ const cards=[...document.querySelectorAll('article')],search=document.querySelec
 const entries=cards.map(card=>[card,card.textContent.toLocaleLowerCase()]);
 const filters=[...document.querySelectorAll('[data-filter]')];
 let category='all';
-const track=(event,params={})=>window.dataLayer.push({event,...params});
+// The existing GTM container loads this Google tag. Route events once via gtag.
+const track=(event,params={})=>gtag('event',event,{...params,send_to:'G-7MSJNH4L4Q'});
 let searchTimer;
 function applyFilters(){
   const words=search.value.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
