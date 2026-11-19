@@ -79,10 +79,19 @@ header .hero-drawing{grid-column:2;grid-row:1 / 7;min-width:0;pointer-events:non
 }
 @media(max-width:700px){header>div{display:block}header .hero-drawing{position:absolute;width:35%;right:0;top:0;opacity:.35}header h1{position:relative}header .start-reading{display:block}.reader-art svg{max-height:180px}}
 
+
+.home-recommendation{grid-column:1 / -1;border-top:1px solid #75665c;padding-top:20px;margin-top:28px;max-width:760px}
+.home-recommendation h2{font-size:clamp(1.65rem,4vw,2.6rem)}
+.home-recommendation p{max-width:55ch;font-size:1.05rem}
+.home-recommendation button,.intro-skip{font:inherit;cursor:pointer;border:1px solid #a78b78;background:transparent;color:#ffb39a;padding:8px 14px;border-radius:5px;margin:6px 8px 0 0}
+.intro-skip{position:absolute;right:0;top:0;font-size:.85rem}
+.home-recommendation small{color:#c5b8ab}
+@media(max-width:700px){.intro-skip{position:static;display:block;width:fit-content}.home-recommendation{position:relative}.hero-drawing{z-index:0}}
+
 </style>
 </head>
 <body>
-<header><div><p class="eyebrow">WORD NOTES / 每天認識一個詞彙</p><h1>這個詞，<br><span>是什麼？</span></h1><p>有些事，你早就遇過。<br>只是還不知道，原來它有個名字。</p><button class="start-reading" type="button">開始翻讀最新詞彙 →</button><a class="entry-link" href="#word-index">打開詞彙索引 ↓</a><div class="hero-drawing" aria-hidden="true"><svg viewBox="0 0 500 540" xmlns="http://www.w3.org/2000/svg">
+<header><div><p class="eyebrow">WORD NOTES / 每天認識一個詞彙</p><h1>這個詞，<br><span>是什麼？</span></h1><p>有些事，你早就遇過。<br>只是還不知道，原來它有個名字。</p><button class="start-reading" type="button">開始翻讀最新詞彙 →</button><a class="entry-link" href="#word-index">打開詞彙索引 ↓</a><button class="intro-skip" type="button" hidden>跳過動畫 ↓</button><div class="home-recommendation" aria-labelledby="recommend-title"><small>隨機讀一個詞</small><h2 id="recommend-title"></h2><p id="recommend-text"></p><button id="recommend-read" type="button">翻讀這個詞 →</button><button id="recommend-another" type="button">換一個詞 ↻</button></div><div class="hero-drawing" aria-hidden="true"><svg viewBox="0 0 500 540" xmlns="http://www.w3.org/2000/svg">
 <g class="book"><path d="M55 225l180-40 130 48-13 170-132-38-165 35z" fill="#e1bd57" stroke="#171619" stroke-width="7"/><path d="M235 185l-15 180m-145-96 126-25m-128 62 126-25m53-26 83 27m-86 7 83 27" fill="none" stroke="#563f29" stroke-width="5"/></g>
 <g class="lens"><circle cx="331" cy="145" r="80" fill="#9dc4b4" stroke="#171619" stroke-width="10"/><path d="M383 209l75 78-27 25-76-80" fill="#f17a54" stroke="#171619" stroke-width="8"/><text x="331" y="170" text-anchor="middle" fill="#21332e" font-size="75" font-family="sans-serif">?</text></g>
 <g class="label"><path d="M230 409l198-10 6 74-192 14z" fill="#ef784f" stroke="#171619" stroke-width="6"/><text x="332" y="455" text-anchor="middle" fill="#211e20" font-size="27" font-family="sans-serif" font-weight="700">原來有個名字</text></g>
@@ -327,7 +336,7 @@ async function changeBeat(delta){
   await new Promise(resolve=>setTimeout(resolve,matchMedia('(prefers-reduced-motion: reduce)').matches?0:850));
  }finally{if(version===turnVersion)turning=false}
 }
-document.querySelector('.start-reading').addEventListener('click',()=>cards[0]?.querySelector('.read-film').click());
+document.querySelector('.start-reading').addEventListener('click',()=>{finishIntro();(recommended||cards[0])?.querySelector('.read-film').click()});
 prev.addEventListener('click',()=>changeBeat(-1));next.addEventListener('click',()=>changeBeat(1));closeReader.addEventListener('click',exitReader);
 reader.addEventListener('keydown',event=>{
  if(event.key==='Escape'){event.preventDefault();exitReader()}
@@ -353,6 +362,51 @@ scene.addEventListener('wheel',event=>{
 let touchX=null;
 scene.addEventListener('touchstart',e=>{touchX=e.touches.length===1?e.touches[0].clientX:null},{passive:true});
 scene.addEventListener('touchend',e=>{if(touchX===null)return;const delta=touchX-e.changedTouches[0].clientX;touchX=null;if(Math.abs(delta)>70)changeBeat(delta>0?1:-1)},{passive:true});
+
+
+// A short, finite homepage sequence. Content stays visible without JavaScript.
+const recommendation=document.querySelector('.home-recommendation');
+let recommended=null;
+function recommendWord(){
+ const options=cards.filter(card=>card!==recommended);
+ recommended=options[Math.floor(Math.random()*options.length)]||cards[0];
+ if(!recommended)return;
+ recommendation.querySelector('h2').textContent=recommended.querySelector('h2').textContent;
+ const paragraphs=[...recommended.querySelectorAll('details section:first-of-type p')];
+ const definition=paragraphs.find(p=>p.textContent.trim().length>25)||paragraphs[0];
+ recommendation.querySelector('#recommend-text').textContent=definition?.textContent||'打開這個詞，一起看看它的意思。';
+ document.querySelector('.start-reading').textContent='開始翻讀推薦詞彙 →';
+}
+recommendWord();
+recommendation.querySelector('#recommend-read').addEventListener('click',()=>recommended?.querySelector('.read-film').click());
+recommendation.querySelector('#recommend-another').addEventListener('click',()=>{
+ recommendWord();
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)
+  recommendation.animate([{opacity:.3,transform:'translateY(15px)'},{opacity:1,transform:'none'}],{duration:380,easing:'ease-out'});
+});
+const introAnimations=[],skipIntro=document.querySelector('.intro-skip');
+function finishIntro(){for(const animation of introAnimations){try{animation.finish()}catch{}}skipIntro.hidden=true}
+skipIntro.addEventListener('click',finishIntro);
+function playHomepageIntro(){
+ if(location.hash||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ skipIntro.hidden=false;
+ const ease='cubic-bezier(.22,1,.36,1)';
+ function enter(el,frames,delay,duration){
+  if(!el)return;
+  introAnimations.push(el.animate(frames,{delay,duration,easing:ease,fill:'backwards'}));
+ }
+ enter(document.querySelector('header .eyebrow'),[{opacity:0},{opacity:1}],0,450);
+ enter(document.querySelector('header h1'),[{opacity:0,transform:'translateY(100px)'},{opacity:1,transform:'none'}],200,850);
+ enter(document.querySelector('.hero-drawing .book'),[{opacity:0,translate:'-160px 140px',rotate:'-35deg'},{opacity:1,translate:'0px 0px',rotate:'0deg'}],700,1000);
+ enter(document.querySelector('.hero-drawing .lens'),[{opacity:0,translate:'180px -120px',scale:'.5'},{opacity:1,translate:'0px 0px',scale:'1'}],1250,950);
+ enter(document.querySelector('.hero-drawing .label'),[{opacity:0,translate:'0px 100px',rotate:'12deg'},{opacity:1,translate:'0px 0px',rotate:'0deg'}],1900,650);
+ enter(document.querySelector('header > div > p:not(.eyebrow)'),[{opacity:0,transform:'translateY(25px)'},{opacity:1,transform:'none'}],2200,700);
+ enter(document.querySelector('.start-reading'),[{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'none'}],2600,500);
+ enter(recommendation,[{opacity:0,transform:'translateY(60px)'},{opacity:1,transform:'none'}],2900,900);
+ Promise.allSettled(introAnimations.map(a=>a.finished)).then(()=>{skipIntro.hidden=true});
+}
+document.querySelector('.start-reading').addEventListener('pointerdown',finishIntro);
+playHomepageIntro();
 
 </script>
 </body></html>
