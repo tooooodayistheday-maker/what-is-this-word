@@ -43,6 +43,22 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{o
 @media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}article{animation:enter .5s ease both}@keyframes enter{from{opacity:.7;transform:translateY(8px)}to{opacity:1;transform:none}}}
 @media(max-width:600px){header{min-height:70svh}body{font-size:17px}.controls{gap:4px}.controls p{margin-top:0}h1{font-size:clamp(3.2rem,14vw,5rem)}}
 
+
+.reader[hidden]{display:none}.reader{position:fixed;inset:0;z-index:100;background:#e6dfce;color:#252223;display:flex;flex-direction:column;padding:24px clamp(20px,6vw,90px);overflow:auto}
+.reader button{font:inherit;cursor:pointer;color:inherit;background:transparent;border:1px solid currentColor;border-radius:6px;padding:8px 16px}
+.reader-top,.reader-bottom{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.reader-top{font: .85rem ui-monospace,monospace}.reader-top span{max-width:55%}
+.reader-bottom{padding:16px 0}.reader button:disabled{opacity:.35;cursor:default}
+.reader-scene{flex:1;display:grid;grid-template-columns:1fr .65fr;gap:clamp(16px,4vw,60px);align-items:center;padding:30px 0}
+.reader-copy h2{font-size:clamp(2rem,5vw,4.6rem);line-height:1.2;margin:10px 0 24px}
+.reader-copy h3{color:#943b24;font-size:1rem}.reader-copy p{color:#292326;font-size:clamp(1rem,1.65vw,1.25rem);line-height:1.9}
+.reader-art svg{width:100%;max-height:420px;filter:drop-shadow(8px 12px 0 #29232620)}
+.reader-progress{height:3px;background:#b2a693;margin:8px 0}.reader-progress span{display:block;background:#b24225;height:100%;transition:width .35s}
+.read-film{margin-top:12px!important;color:#ffad90;background:transparent;border:1px solid #9a7865;border-radius:4px;font:inherit;padding:7px 13px;cursor:pointer}
+.reader a{color:#85371d}.reader-scene[data-beat="1"] .reader-art{transform:rotate(-5deg)}.reader-scene[data-beat="2"] .reader-art{transform:rotate(5deg)}
+@media(prefers-reduced-motion:no-preference){.reader-scene{animation:sceneEnter .4s ease both}.reader-art{transition:transform .45s}@keyframes sceneEnter{from{opacity:0;transform:translateX(35px)}to{opacity:1;transform:none}}}
+@media(max-width:650px){.reader{padding:16px 20px}.reader-scene{grid-template-columns:1fr;gap:4px;padding:14px 0}.reader-art{grid-row:1;text-align:center}.reader-art svg{height:150px}.reader-copy h2{font-size:2rem;margin:6px 0 12px}.reader-copy p{font-size:1rem}.reader-bottom{font-size:.85rem}.reader-top span{font-size:.7rem}}
+
 </style>
 </head>
 <body>
@@ -174,6 +190,14 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{o
 </div>
 <p id="empty" hidden>沒有符合的詞彙，試試其他關鍵字。</p>
 </main>
+
+<div class="reader" role="dialog" aria-modal="true" aria-labelledby="reader-title" hidden tabindex="-1">
+<div class="reader-top"><span id="reader-label"></span><button id="reader-close" type="button">回到索引 ×</button></div>
+<div class="reader-progress" aria-hidden="true"><span></span></div>
+<div class="reader-scene"><div class="reader-copy"></div><div class="reader-art" aria-hidden="true"></div></div>
+<div class="reader-bottom"><button id="reader-prev" type="button">← 上一幕</button><span id="reader-position" aria-live="polite"></span><button id="reader-next" type="button">下一幕 →</button></div>
+</div>
+
 <footer><a href="https://www.threads.com/@tooooodayistheday">在 Threads 看每日詞彙 ↗</a></footer>
 <script>
 const cards=[...document.querySelectorAll('article')],search=document.querySelector('#search');
@@ -214,5 +238,60 @@ function openTerm(){
   if(card){if(card.hidden){search.value='';category='all';applyFilters()}card.querySelector('details').open=true;card.scrollIntoView({block:'start'})}
 }
 addEventListener('hashchange',openTerm);openTerm();
+
+const reader=document.querySelector('.reader'),scene=reader.querySelector('.reader-scene'),copy=reader.querySelector('.reader-copy');
+const prev=reader.querySelector('#reader-prev'),next=reader.querySelector('#reader-next'),closeReader=reader.querySelector('#reader-close');
+const art=reader.querySelector('.reader-art');
+let activeCard=null,beat=0,returnFocus=null,savedOverflow='';
+const drawings=[
+'<path d="M58 265L153 140l104 35 24 122-120 37z" fill="#d0a53f" stroke="#292326" stroke-width="5"/><path d="M153 140l8 194m-103-69 103 69 120-37" fill="none" stroke="#292326" stroke-width="5"/><circle cx="175" cy="115" r="65" fill="#ef6e44" stroke="#292326" stroke-width="5"/><path d="M150 100q30-35 55 0m-43 22q15 13 30-3" fill="none" stroke="#292326" stroke-width="5" stroke-linecap="round"/><path d="M94 59l-12-24m162 42 27-18m-68-37 7-27" stroke="#292326" stroke-width="6"/>',
+'<path d="M60 287l20-160 164 19 30 160z" fill="#e6b647" stroke="#292326" stroke-width="5"/><path d="M83 130l83-62 78 78" fill="#ed7250" stroke="#292326" stroke-width="5"/><path d="M142 299v-82h49v86" fill="#76a4a0" stroke="#292326" stroke-width="5"/><path d="M99 165h30v30H99zm102 9h28v28h-28z" fill="#faf2df" stroke="#292326" stroke-width="4"/><path d="M34 326q140-22 273 0" fill="none" stroke="#292326" stroke-width="5"/>',
+'<circle cx="134" cy="161" r="80" fill="#8cb4a5" stroke="#292326" stroke-width="6"/><path d="M191 222l83 81-25 25-84-84" fill="#ed7250" stroke="#292326" stroke-width="6"/><path d="M97 161l24 24 49-59" fill="none" stroke="#292326" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M246 70v38m-19-19h38" stroke="#292326" stroke-width="5"/>'
+];
+function showScene(){
+ const sections=activeCard.querySelectorAll('details section');
+ copy.replaceChildren();
+ const title=document.createElement('h2');title.id='reader-title';title.textContent=activeCard.querySelector('h2').textContent;copy.append(title);
+ copy.append(sections[beat].cloneNode(true));
+ if(beat===2){
+  const reference=document.createElement('button');reference.type='button';reference.textContent='回索引看資料來源 ↗';
+  reference.addEventListener('click',()=>{exitReader();activeCard.querySelector('details').open=true;activeCard.querySelector('details section:last-of-type').scrollIntoView({block:'center'})});copy.append(reference);
+ }
+ art.innerHTML='<svg viewBox="0 0 340 360" xmlns="http://www.w3.org/2000/svg">'+drawings[beat]+'</svg>';
+ reader.querySelector('#reader-label').textContent=activeCard.querySelector('.meta').textContent;
+ reader.querySelector('#reader-position').textContent=(beat+1)+' / 3';
+ reader.querySelector('.reader-progress span').style.width=((beat+1)/3*100)+'%';
+ prev.disabled=beat===0;next.disabled=beat===2;scene.dataset.beat=beat;
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)scene.animate([{opacity:0,transform:'translateX(24px)'},{opacity:1,transform:'translateX(0)'}],{duration:380,easing:'ease-out'});
+ reader.scrollTop=0;
+}
+function exitReader(){reader.hidden=true;document.body.style.overflow=savedOverflow;for(const el of [document.querySelector('header'),document.querySelector('main'),document.querySelector('footer')])el.inert=false;returnFocus?.focus()}
+for(const card of cards){
+ const button=document.createElement('button');button.type='button';button.className='read-film';button.textContent='用三幕翻讀 →';
+ card.append(button);
+ button.addEventListener('click',()=>{
+  activeCard=card;beat=0;returnFocus=button;savedOverflow=document.body.style.overflow;
+  reader.hidden=false;document.body.style.overflow='hidden';
+  for(const el of [document.querySelector('header'),document.querySelector('main'),document.querySelector('footer')])el.inert=true;
+  showScene();closeReader.focus();
+  track('word_reader_open',{term_id:card.id,word_category:card.dataset.category});
+ });
+}
+function changeBeat(delta){const target=beat+delta;if(reader.hidden||target<0||target>2)return;beat=target;showScene()}
+prev.addEventListener('click',()=>changeBeat(-1));next.addEventListener('click',()=>changeBeat(1));closeReader.addEventListener('click',exitReader);
+reader.addEventListener('keydown',event=>{
+ if(event.key==='Escape'){event.preventDefault();exitReader()}
+ if(event.key==='ArrowRight'){event.preventDefault();changeBeat(1)}
+ if(event.key==='ArrowLeft'){event.preventDefault();changeBeat(-1)}
+ if(event.key==='Tab'){
+  const nodes=[...reader.querySelectorAll('button:not(:disabled),a[href]')],first=nodes[0],last=nodes.at(-1);
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+ }
+});
+let touchX=null;
+scene.addEventListener('touchstart',e=>{touchX=e.touches.length===1?e.touches[0].clientX:null},{passive:true});
+scene.addEventListener('touchend',e=>{if(touchX===null)return;const delta=touchX-e.changedTouches[0].clientX;touchX=null;if(Math.abs(delta)>70)changeBeat(delta>0?1:-1)},{passive:true});
+
 </script>
 </body></html>
