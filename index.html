@@ -59,10 +59,34 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{o
 @media(prefers-reduced-motion:no-preference){.reader-scene{animation:none}.reader-art{transition:transform .45s}@keyframes sceneEnter{from{opacity:0;transform:translateX(35px)}to{opacity:1;transform:none}}}
 @media(max-width:650px){.reader{padding:16px 20px}.reader-scene{grid-template-columns:1fr;gap:4px;padding:14px 0}.reader-art{grid-row:1;text-align:center}.reader-art svg{height:150px}.reader-copy h2{font-size:2rem;margin:6px 0 12px}.reader-copy p{font-size:1rem}.reader-bottom{font-size:.85rem}.reader-top span{font-size:.7rem}}
 
+
+header>div{display:grid;grid-template-columns:1.1fr .9fr;column-gap:30px;align-items:center}
+header .eyebrow,header h1,header p,header .entry-link,header .start-reading{grid-column:1}
+header .hero-drawing{grid-column:2;grid-row:1 / 7;min-width:0;pointer-events:none}
+.hero-drawing svg{width:100%;height:auto;filter:drop-shadow(14px 20px 0 #0004)}
+.start-reading{justify-self:start;background:#ff7753;color:#231d19;border:0;border-radius:5px;padding:14px 22px;font:inherit;font-weight:700;cursor:pointer;margin-top:20px}
+.start-reading:focus-visible{outline:3px solid white;outline-offset:4px}
+.reader{transition:background-color .6s,color .6s}
+.reader[data-page="1"]{background:#d2e4dd}.reader[data-page="2"]{background:#dcd9ec}
+.reader-scene{overflow:hidden}.reader-art{will-change:transform}.reader-art svg{max-height:520px}
+@media(prefers-reduced-motion:no-preference){
+.hero-drawing .book{animation:bookFloat 6s ease-in-out infinite;transform-origin:center}
+.hero-drawing .lens{animation:lensFloat 5s ease-in-out infinite;transform-origin:center}
+.hero-drawing .label{animation:labelFloat 7s ease-in-out infinite}
+@keyframes bookFloat{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-25px) rotate(-2deg)}}
+@keyframes lensFloat{0%,100%{transform:translate(0,0) rotate(8deg)}50%{transform:translate(-24px,18px) rotate(-8deg)}}
+@keyframes labelFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(20px)}}
+}
+@media(max-width:700px){header>div{display:block}header .hero-drawing{position:absolute;width:35%;right:0;top:0;opacity:.35}header h1{position:relative}header .start-reading{display:block}.reader-art svg{max-height:180px}}
+
 </style>
 </head>
 <body>
-<header><div><p class="eyebrow">WORD NOTES / 每天認識一個詞彙</p><h1>這個詞，<br><span>是什麼？</span></h1><p>有些事，你早就遇過。<br>只是還不知道，原來它有個名字。</p><a class="entry-link" href="#word-index">打開詞彙索引 ↓</a></div></header>
+<header><div><p class="eyebrow">WORD NOTES / 每天認識一個詞彙</p><h1>這個詞，<br><span>是什麼？</span></h1><p>有些事，你早就遇過。<br>只是還不知道，原來它有個名字。</p><button class="start-reading" type="button">開始翻讀最新詞彙 →</button><a class="entry-link" href="#word-index">打開詞彙索引 ↓</a><div class="hero-drawing" aria-hidden="true"><svg viewBox="0 0 500 540" xmlns="http://www.w3.org/2000/svg">
+<g class="book"><path d="M55 225l180-40 130 48-13 170-132-38-165 35z" fill="#e1bd57" stroke="#171619" stroke-width="7"/><path d="M235 185l-15 180m-145-96 126-25m-128 62 126-25m53-26 83 27m-86 7 83 27" fill="none" stroke="#563f29" stroke-width="5"/></g>
+<g class="lens"><circle cx="331" cy="145" r="80" fill="#9dc4b4" stroke="#171619" stroke-width="10"/><path d="M383 209l75 78-27 25-76-80" fill="#f17a54" stroke="#171619" stroke-width="8"/><text x="331" y="170" text-anchor="middle" fill="#21332e" font-size="75" font-family="sans-serif">?</text></g>
+<g class="label"><path d="M230 409l198-10 6 74-192 14z" fill="#ef784f" stroke="#171619" stroke-width="6"/><text x="332" y="455" text-anchor="middle" fill="#211e20" font-size="27" font-family="sans-serif" font-weight="700">原來有個名字</text></g>
+</svg></div></div></header>
 <main id="word-index"><p class="index-kicker">THE INDEX / 從生活裡找一個詞</p>
 <div class="categories" aria-labelledby="category-title"><h2 id="category-title">按主題閱讀</h2><div class="filters" role="group" aria-label="詞彙分類"><button type="button" data-filter="all" aria-pressed="true">全部 <span>20</span></button><button type="button" data-filter="psychology" aria-pressed="false">心理與思考 <span>9</span></button><button type="button" data-filter="urban" aria-pressed="false">城市與空間 <span>3</span></button><button type="button" data-filter="digital" aria-pressed="false">數位生活 <span>2</span></button><button type="button" data-filter="society" aria-pressed="false">社會與日常 <span>2</span></button><button type="button" data-filter="design" aria-pressed="false">設計與無障礙 <span>2</span></button><button type="button" data-filter="everyday" aria-pressed="false">日常經濟 <span>2</span></button></div></div>
 <div class="controls"><label for="search">找詞彙<input id="search" type="search" placeholder="輸入詞彙、分類或關鍵字"></label><p id="count" aria-live="polite">共 20 則</p></div>
@@ -195,7 +219,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{o
 <div class="reader-top"><span id="reader-label"></span><button id="reader-close" type="button">回到索引 ×</button></div>
 <div class="reader-progress" aria-hidden="true"><span></span></div>
 <div class="reader-scene"><div class="reader-copy"></div><div class="reader-art" aria-hidden="true"></div></div>
-<div class="reader-bottom"><button id="reader-prev" type="button">← 上一幕</button><span id="reader-position" aria-live="polite"></span><button id="reader-next" type="button">下一幕 →</button></div>
+<div class="reader-bottom"><button id="reader-prev" type="button">← 上一幕</button><span><span id="reader-position" aria-live="polite"></span><br><small>點箭頭或用 ← → 換頁</small></span><button id="reader-next" type="button">下一幕 →</button></div>
 </div>
 
 <footer><a href="https://www.threads.com/@tooooodayistheday">在 Threads 看每日詞彙 ↗</a></footer>
@@ -249,6 +273,7 @@ const drawings=[
 '<circle cx="134" cy="161" r="80" fill="#8cb4a5" stroke="#292326" stroke-width="6"/><path d="M191 222l83 81-25 25-84-84" fill="#ed7250" stroke="#292326" stroke-width="6"/><path d="M97 161l24 24 49-59" fill="none" stroke="#292326" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M246 70v38m-19-19h38" stroke="#292326" stroke-width="5"/>'
 ];
 function showScene(direction=1){
+ reader.dataset.page=beat;
  const sections=activeCard.querySelectorAll('details section');
  copy.replaceChildren();
  const title=document.createElement('h2');title.id='reader-title';title.textContent=activeCard.querySelector('h2').textContent;copy.append(title);
@@ -269,7 +294,7 @@ function showScene(direction=1){
    {opacity:1,transform:'translateY(0)'}
   ],{duration:640,delay:i*65,easing:ease,fill:'backwards'}));
   art.querySelectorAll('svg > *').forEach((el,i)=>el.animate([
-   {opacity:0,transform:'translate('+((70+i*12)*direction)+'px,'+(30-i*8)+'px) rotate('+(direction*8)+'deg)'},
+   {opacity:0,transform:'translate('+((280+i*24)*direction)+'px,'+(30-i*8)+'px) rotate('+(direction*8)+'deg)'},
    {opacity:1,transform:'translate(0,0) rotate(0deg)'}
   ],{duration:850,delay:80+i*50,easing:ease,fill:'backwards'}));
  }
@@ -293,8 +318,8 @@ async function changeBeat(delta){
  turning=true;const version=++turnVersion;
  try{
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
-   const outgoing=[copy.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY('+(-delta*40)+'px)'}],{duration:230,easing:'ease-in'}),
-   art.animate([{opacity:1,transform:'translateX(0) scale(1)'},{opacity:0,transform:'translateX('+(-delta*90)+'px) scale(.92)'}],{duration:300,easing:'ease-in'})];
+   const outgoing=[copy.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY('+(-delta*100)+'px)'}],{duration:230,easing:'ease-in'}),
+   art.animate([{opacity:1,transform:'translateX(0) scale(1)'},{opacity:0,transform:'translateX('+(-delta*320)+'px) scale(.92)'}],{duration:300,easing:'ease-in'})];
    await Promise.all(outgoing.map(a=>a.finished.catch(()=>{})));
   }
   if(reader.hidden||version!==turnVersion)return;
@@ -302,6 +327,7 @@ async function changeBeat(delta){
   await new Promise(resolve=>setTimeout(resolve,matchMedia('(prefers-reduced-motion: reduce)').matches?0:850));
  }finally{if(version===turnVersion)turning=false}
 }
+document.querySelector('.start-reading').addEventListener('click',()=>cards[0]?.querySelector('.read-film').click());
 prev.addEventListener('click',()=>changeBeat(-1));next.addEventListener('click',()=>changeBeat(1));closeReader.addEventListener('click',exitReader);
 reader.addEventListener('keydown',event=>{
  if(event.key==='Escape'){event.preventDefault();exitReader()}
