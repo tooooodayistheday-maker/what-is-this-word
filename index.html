@@ -88,14 +88,27 @@ header .hero-drawing{grid-column:2;grid-row:1 / 7;min-width:0;pointer-events:non
 .home-recommendation small{color:#c5b8ab}
 @media(max-width:700px){.intro-skip{position:static;display:block;width:fit-content}.home-recommendation{position:relative}.hero-drawing{z-index:0}}
 
+
+/* Original generated paper-sculpture assets. */
+header{min-height:100svh}
+header .hero-drawing{position:relative;min-height:460px;opacity:1}
+.paper-object{background-image:url('./assets/paper-objects-v1.png');background-size:300% 100%;background-repeat:no-repeat;width:100%;aspect-ratio:1;filter:drop-shadow(0 18px 18px #0002)}
+.paper-object.book{background-position:0% 50%}.paper-object.lens{background-position:50% 50%}.paper-object.door{background-position:100% 50%}
+.still-life .book{position:absolute;width:88%;left:-5%;top:28%;animation:none!important;transform:rotate(-12deg)}
+.still-life .lens{position:absolute;width:64%;left:42%;top:-5%;animation:none!important;transform:rotate(8deg)}
+.still-life .door{position:absolute;width:53%;left:40%;top:30%;animation:none!important}
+.paper-caption{position:absolute;left:10%;bottom:-25px;font-size:.85rem;letter-spacing:.08em;color:#e3c9b6}
+.scene-objects{position:relative;min-height:360px;display:grid;place-items:center}
+.scene-objects .paper-object{width:min(100%,420px)}
+.scene-word{position:absolute;bottom:8%;background:#f6efdf;color:#29332e;padding:8px 18px;box-shadow:0 8px 20px #0002;font-size:clamp(1rem,2vw,1.5rem);transform:rotate(-5deg);font-weight:700}
+.reader-scene[data-beat="1"] .reader-art,.reader-scene[data-beat="2"] .reader-art{transform:none}
+.reader[data-page="0"]{background:#f1eee5}.reader[data-page="1"]{background:#e1e7e0}.reader[data-page="2"]{background:#e9e1db}
+@media(max-width:700px){header .hero-drawing{position:relative;width:100%;min-height:290px;margin:24px auto;max-width:380px;top:auto;right:auto}.still-life .book{width:70%;top:20%}.still-life .lens{width:53%;top:0;left:43%}.still-life .door{width:40%;left:57%;top:20%}.paper-caption{bottom:0;left:0}.scene-objects{min-height:180px}.scene-objects .paper-object{width:180px}.scene-word{right:8%;bottom:5%;font-size:.85rem}.reader-scene{overflow:visible}}
+
 </style>
 </head>
 <body>
-<header><div><p class="eyebrow">WORD NOTES / 每天認識一個詞彙</p><h1>這個詞，<br><span>是什麼？</span></h1><p>有些事，你早就遇過。<br>只是還不知道，原來它有個名字。</p><button class="start-reading" type="button">開始翻讀最新詞彙 →</button><a class="entry-link" href="#word-index">打開詞彙索引 ↓</a><button class="intro-skip" type="button" hidden>跳過動畫 ↓</button><div class="home-recommendation" aria-labelledby="recommend-title"><small>隨機讀一個詞</small><h2 id="recommend-title"></h2><p id="recommend-text"></p><button id="recommend-read" type="button">翻讀這個詞 →</button><button id="recommend-another" type="button">換一個詞 ↻</button></div><div class="hero-drawing" aria-hidden="true"><svg viewBox="0 0 500 540" xmlns="http://www.w3.org/2000/svg">
-<g class="book"><path d="M55 225l180-40 130 48-13 170-132-38-165 35z" fill="#e1bd57" stroke="#171619" stroke-width="7"/><path d="M235 185l-15 180m-145-96 126-25m-128 62 126-25m53-26 83 27m-86 7 83 27" fill="none" stroke="#563f29" stroke-width="5"/></g>
-<g class="lens"><circle cx="331" cy="145" r="80" fill="#9dc4b4" stroke="#171619" stroke-width="10"/><path d="M383 209l75 78-27 25-76-80" fill="#f17a54" stroke="#171619" stroke-width="8"/><text x="331" y="170" text-anchor="middle" fill="#21332e" font-size="75" font-family="sans-serif">?</text></g>
-<g class="label"><path d="M230 409l198-10 6 74-192 14z" fill="#ef784f" stroke="#171619" stroke-width="6"/><text x="332" y="455" text-anchor="middle" fill="#211e20" font-size="27" font-family="sans-serif" font-weight="700">原來有個名字</text></g>
-</svg></div></div></header>
+<header><div><p class="eyebrow">WORD NOTES / 每天認識一個詞彙</p><h1>這個詞，<br><span>是什麼？</span></h1><p>有些事，你早就遇過。<br>只是還不知道，原來它有個名字。</p><button class="start-reading" type="button">開始翻讀最新詞彙 →</button><a class="entry-link" href="#word-index">打開詞彙索引 ↓</a><button class="intro-skip" type="button" hidden>跳過動畫 ↓</button><div class="home-recommendation" aria-labelledby="recommend-title"><small>隨機讀一個詞</small><h2 id="recommend-title"></h2><p id="recommend-text"></p><button id="recommend-read" type="button">翻讀這個詞 →</button><button id="recommend-another" type="button">換一個詞 ↻</button></div><div class="hero-drawing still-life" aria-hidden="true"><div class="paper-object book"></div><div class="paper-object lens"></div><div class="paper-object label door"></div><span class="paper-caption">從一個詞，打開另一種看法。</span></div></div></header>
 <main id="word-index"><p class="index-kicker">THE INDEX / 從生活裡找一個詞</p>
 <div class="categories" aria-labelledby="category-title"><h2 id="category-title">按主題閱讀</h2><div class="filters" role="group" aria-label="詞彙分類"><button type="button" data-filter="all" aria-pressed="true">全部 <span>21</span></button><button type="button" data-filter="psychology" aria-pressed="false">心理與思考 <span>9</span></button><button type="button" data-filter="urban" aria-pressed="false">城市與空間 <span>3</span></button><button type="button" data-filter="digital" aria-pressed="false">數位生活 <span>2</span></button><button type="button" data-filter="society" aria-pressed="false">社會與日常 <span>3</span></button><button type="button" data-filter="design" aria-pressed="false">設計與無障礙 <span>2</span></button><button type="button" data-filter="everyday" aria-pressed="false">日常經濟 <span>2</span></button></div></div>
 <div class="controls"><label for="search">找詞彙<input id="search" type="search" placeholder="輸入詞彙、分類或關鍵字"></label><p id="count" aria-live="polite">共 21 則</p></div>
@@ -103,7 +116,7 @@ header .hero-drawing{grid-column:2;grid-row:1 / 7;min-width:0;pointer-events:non
 <article id="term-020" data-category="society">
 <div class="meta"><span>社會與日常</span><time>2026-11-19</time></div>
 <h2><a href="#term-020">數位落差</a></h2>
-<details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>數位落差是指不同族群在接觸與使用數位科技時，因設備、網路普及或資源條件不同所形成的差距。這會實質影響公眾享有各類數位服務的機會。</p><p>以臺灣為例，主管機關便持續推動偏鄉通訊網路韌性與數據通信接取普及服務。國外調查亦顯示，數位科技的落差並非單一現象，各項工具的使用門檻各異。</p><p>詞彙網站：https://tooooodayistheday-maker.github.io/what-is-this-word/</p><p>本篇詞條：https://tooooodayistheday-maker.github.io/what-is-this-word/#term-020</p></section><section><h3>生活例子</h3><p>自編示意：小陳想替長輩線上掛號，發現老家缺乏固網寬頻，長輩僅習慣傳訊息，難以自行操作病患入口網站查詢就診與檢查紀錄。</p><p>此情境點出數位落差的細節：固網寬頻與操作熟悉度等外部條件，直接影響長輩使用線上醫療服務，突顯基礎建設與介面近用的重要性。</p></section><section><h3>界線與觀察</h3><p>容易混淆的界線在於，人們常以為擁有手機就代表沒有數位落差。但能收發訊息不等於能順利使用特定線上服務，各工具的資源門檻大不相同。</p><p>日常觀察時不妨思考：當公共申辦或醫療服務全面轉向數位時，缺乏固定網路或必要指引的群體，是否可能在無意間被排除在服務之外？</p></section>
+<details><summary>閱讀詞彙筆記</summary><section><h3>白話解釋</h3><p>數位落差是指不同族群在接觸與使用數位科技時，因設備、網路普及或資源條件不同所形成的差距。這會實質影響公眾享有各類數位服務的機會。</p><p>以臺灣為例，主管機關便持續推動偏鄉通訊網路韌性與數據通信接取普及服務。國外調查亦顯示，數位科技的落差並非單一現象，各項工具的使用門檻各異。</p></section><section><h3>生活例子</h3><p>自編示意：小陳想替長輩線上掛號，發現老家缺乏固網寬頻，長輩僅習慣傳訊息，難以自行操作病患入口網站查詢就診與檢查紀錄。</p><p>此情境點出數位落差的細節：固網寬頻與操作熟悉度等外部條件，直接影響長輩使用線上醫療服務，突顯基礎建設與介面近用的重要性。</p></section><section><h3>界線與觀察</h3><p>容易混淆的界線在於，人們常以為擁有手機就代表沒有數位落差。但能收發訊息不等於能順利使用特定線上服務，各工具的資源門檻大不相同。</p><p>日常觀察時不妨思考：當公共申辦或醫療服務全面轉向數位時，缺乏固定網路或必要指引的群體，是否可能在無意間被排除在服務之外？</p></section>
 <section><h3>資料來源</h3><ul><li><a href="https://moda.gov.tw/">moda — 數位發展部 Ministry of Digital Affairs</a></li><li><a href="https://pubmed.ncbi.nlm.nih.gov/43040837/">One Digital Divide or Three? Patient Portal, Telehealth, and Wearable Use in a National Survey.</a></li></ul><a href="https://www.threads.com/@tooooodayistheday/post/Df7R7AbE2Ze">查看 Threads 原文 ↗</a></section></details>
 </article>
 <article id="term-019" data-category="digital">
@@ -282,11 +295,6 @@ const reader=document.querySelector('.reader'),scene=reader.querySelector('.read
 const prev=reader.querySelector('#reader-prev'),next=reader.querySelector('#reader-next'),closeReader=reader.querySelector('#reader-close');
 const art=reader.querySelector('.reader-art');
 let activeCard=null,beat=0,returnFocus=null,savedOverflow='';
-const drawings=[
-'<path d="M58 265L153 140l104 35 24 122-120 37z" fill="#d0a53f" stroke="#292326" stroke-width="5"/><path d="M153 140l8 194m-103-69 103 69 120-37" fill="none" stroke="#292326" stroke-width="5"/><circle cx="175" cy="115" r="65" fill="#ef6e44" stroke="#292326" stroke-width="5"/><path d="M150 100q30-35 55 0m-43 22q15 13 30-3" fill="none" stroke="#292326" stroke-width="5" stroke-linecap="round"/><path d="M94 59l-12-24m162 42 27-18m-68-37 7-27" stroke="#292326" stroke-width="6"/>',
-'<path d="M60 287l20-160 164 19 30 160z" fill="#e6b647" stroke="#292326" stroke-width="5"/><path d="M83 130l83-62 78 78" fill="#ed7250" stroke="#292326" stroke-width="5"/><path d="M142 299v-82h49v86" fill="#76a4a0" stroke="#292326" stroke-width="5"/><path d="M99 165h30v30H99zm102 9h28v28h-28z" fill="#faf2df" stroke="#292326" stroke-width="4"/><path d="M34 326q140-22 273 0" fill="none" stroke="#292326" stroke-width="5"/>',
-'<circle cx="134" cy="161" r="80" fill="#8cb4a5" stroke="#292326" stroke-width="6"/><path d="M191 222l83 81-25 25-84-84" fill="#ed7250" stroke="#292326" stroke-width="6"/><path d="M97 161l24 24 49-59" fill="none" stroke="#292326" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M246 70v38m-19-19h38" stroke="#292326" stroke-width="5"/>'
-];
 function showScene(direction=1){
  reader.dataset.page=beat;
  const sections=activeCard.querySelectorAll('details section');
@@ -297,7 +305,8 @@ function showScene(direction=1){
   const reference=document.createElement('button');reference.type='button';reference.textContent='回索引看資料來源 ↗';
   reference.addEventListener('click',()=>{exitReader();activeCard.querySelector('details').open=true;activeCard.querySelector('details section:last-of-type').scrollIntoView({block:'center'})});copy.append(reference);
  }
- art.innerHTML='<svg viewBox="0 0 340 360" xmlns="http://www.w3.org/2000/svg">'+drawings[beat]+'</svg>';
+ art.innerHTML='<div class="scene-objects"><div class="paper-object '+(['book','door','lens'][beat])+'"></div><div class="scene-word"></div></div>';
+ art.querySelector('.scene-word').textContent=activeCard.querySelector('h2').textContent;
  reader.querySelector('#reader-label').textContent=activeCard.querySelector('.meta').textContent;
  reader.querySelector('#reader-position').textContent=(beat+1)+' / 3';
  reader.querySelector('.reader-progress span').style.width=((beat+1)/3*100)+'%';
@@ -308,7 +317,7 @@ function showScene(direction=1){
    {opacity:0,transform:'translateY('+((i===0?48:24)*direction)+'px)'},
    {opacity:1,transform:'translateY(0)'}
   ],{duration:640,delay:i*65,easing:ease,fill:'backwards'}));
-  art.querySelectorAll('svg > *').forEach((el,i)=>el.animate([
+  art.querySelectorAll('.paper-object,.scene-word').forEach((el,i)=>el.animate([
    {opacity:0,transform:'translate('+((280+i*24)*direction)+'px,'+(30-i*8)+'px) rotate('+(direction*8)+'deg)'},
    {opacity:1,transform:'translate(0,0) rotate(0deg)'}
   ],{duration:850,delay:80+i*50,easing:ease,fill:'backwards'}));
@@ -333,6 +342,8 @@ async function changeBeat(delta){
  turning=true;const version=++turnVersion;
  try{
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+   const bridge=art.querySelector('.paper-object');
+   if(bridge)bridge.animate([{transform:'translateX(0) rotate(0deg)',opacity:1},{transform:'translateX('+(-delta*180)+'px) rotate('+(-delta*20)+'deg) scale(1.35)',opacity:0}],{duration:430,easing:'cubic-bezier(.65,0,.35,1)'});
    const outgoing=[copy.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY('+(-delta*100)+'px)'}],{duration:230,easing:'ease-in'}),
    art.animate([{opacity:1,transform:'translateX(0) scale(1)'},{opacity:0,transform:'translateX('+(-delta*320)+'px) scale(.92)'}],{duration:300,easing:'ease-in'})];
    await Promise.all(outgoing.map(a=>a.finished.catch(()=>{})));
@@ -404,11 +415,11 @@ function playHomepageIntro(){
  enter(document.querySelector('header .eyebrow'),[{opacity:0},{opacity:1}],0,450);
  enter(document.querySelector('header h1'),[{opacity:0,transform:'translateY(100px)'},{opacity:1,transform:'none'}],200,850);
  enter(document.querySelector('.hero-drawing .book'),[{opacity:0,translate:'-160px 140px',rotate:'-35deg'},{opacity:1,translate:'0px 0px',rotate:'0deg'}],700,1000);
- enter(document.querySelector('.hero-drawing .lens'),[{opacity:0,translate:'180px -120px',scale:'.5'},{opacity:1,translate:'0px 0px',scale:'1'}],1250,950);
+ enter(document.querySelector('.hero-drawing .lens'),[{opacity:0,translate:'180px -120px',scale:'.5'},{opacity:1,translate:'-70px 100px',scale:'1.25',offset:.6},{opacity:1,translate:'0px 0px',scale:'1'}],1050,1600);
  enter(document.querySelector('.hero-drawing .label'),[{opacity:0,translate:'0px 100px',rotate:'12deg'},{opacity:1,translate:'0px 0px',rotate:'0deg'}],1900,650);
  enter(document.querySelector('header > div > p:not(.eyebrow)'),[{opacity:0,transform:'translateY(25px)'},{opacity:1,transform:'none'}],2200,700);
  enter(document.querySelector('.start-reading'),[{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'none'}],2600,500);
- enter(recommendation,[{opacity:0,transform:'translateY(60px)'},{opacity:1,transform:'none'}],2900,900);
+ enter(recommendation,[{opacity:0,clipPath:'inset(0 100% 0 0)',transform:'translateY(25px)'},{opacity:1,clipPath:'inset(0 0% 0 0)',transform:'none'}],3000,1100);
  Promise.allSettled(introAnimations.map(a=>a.finished)).then(()=>{skipIntro.hidden=true});
 }
 document.querySelector('.start-reading').addEventListener('pointerdown',finishIntro);
