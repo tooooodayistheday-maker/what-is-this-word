@@ -14,11 +14,40 @@ window.dataLayer.push({'gtm.start':Date.now(),event:'gtm.js'});
 <style>
 :root{color-scheme:light;--paper:#f7f5ef;--ink:#172b29;--teal:#165c50;--rule:#ccd9d0;--soft:#e4eee6}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:1rem/1.8 system-ui,"Microsoft JhengHei",sans-serif}main,footer{width:min(940px,calc(100% - 40px));margin:auto}header{background:var(--soft);border-bottom:1px solid var(--rule);padding:clamp(40px,8vw,100px) 0 44px}header div{width:min(940px,calc(100% - 40px));margin:auto}.eyebrow,.meta{color:#395b52;font-weight:650;letter-spacing:.08em;font-size:.86rem}h1{font-size:clamp(2.7rem,8vw,6rem);line-height:1.08;letter-spacing:-.06em;margin:.2em 0}header p{max-width:38em;margin:.5em 0 0}a{color:var(--teal);text-underline-offset:.2em}a:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid #186453;outline-offset:4px}.controls{display:flex;align-items:end;gap:20px;flex-wrap:wrap;margin:34px 0 20px}.controls label{flex:1 1 250px;font-weight:650}input{width:100%;margin-top:6px;background:#fff;border:1px solid #7b9b8e;padding:12px;border-radius:8px;font:inherit;color:inherit}.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}article{background:#fff;border:1px solid var(--rule);border-radius:14px;padding:clamp(18px,4vw,32px);margin-bottom:14px;scroll-margin-top:18px}article:target{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal)}h2{font-size:clamp(1.45rem,4vw,2rem);margin:.18em 0}h2 a{color:inherit;text-decoration:none}h2 a:hover{text-decoration:underline}summary{cursor:pointer;color:var(--teal);font-weight:650;width:fit-content}section{max-width:68ch;border-top:1px solid var(--rule);margin-top:18px;padding-top:12px}h3{font-size:1.05rem;margin:0 0 6px}section p{margin:.35em 0 .85em}li a{overflow-wrap:anywhere}footer{padding:24px 0 45px}[hidden]{display:none!important}
 .categories{margin:30px 0 0}.categories h2{font-size:1rem;letter-spacing:.06em;margin:0 0 10px}.filters{display:flex;gap:8px;flex-wrap:wrap}.filters button{font:inherit;font-weight:650;color:var(--teal);background:white;border:1px solid #7b9b8e;border-radius:999px;padding:7px 13px;cursor:pointer}.filters button span{margin-left:3px;font-weight:400}.filters button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:white}.filters button:focus-visible{outline:3px solid #186453;outline-offset:3px}.categories+.controls{margin-top:18px}
+
+/* Editorial treatment inspired by HUMAN.md; original vocabulary content. */
+:root{color-scheme:dark;--paper:#201e1f;--ink:#f6f0e5;--teal:#ff7753;--rule:#514b48;--soft:#292627}
+body{font-size:18px;line-height:1.9}
+main,footer{width:min(960px,calc(100% - 40px))}
+header{background:var(--paper);padding:26px 0 50px;min-height:82svh;display:flex;align-items:center;position:relative;overflow:hidden}
+header div{width:min(1100px,calc(100% - 40px));position:relative}
+header .eyebrow{font-family:ui-monospace,monospace;color:#c6bfb6;letter-spacing:.12em;font-size:.8rem}
+h1{font-size:clamp(3.4rem,11vw,8.5rem);font-weight:850;line-height:1.1;letter-spacing:-.065em;margin:.45em 0 .3em}
+h1 span{color:#ff7753}header p{color:#d5cdc4;max-width:34em}
+.entry-link{display:inline-block;margin-top:25px;text-decoration:none;border-bottom:1px solid var(--teal);padding:8px 0}
+.index-kicker{font: .85rem ui-monospace,monospace;color:#c8bfb3;padding:30px 0 0;letter-spacing:.1em}
+.categories{margin-top:18px}.categories h2{font-size:1.35rem;letter-spacing:0}
+.filters{gap:9px}.filters button{background:transparent;border-color:#70645e;color:var(--ink);font-size:.95rem;border-radius:5px}
+.filters button[aria-pressed="true"]{background:#ff7753;color:#241a15;border-color:#ff7753}
+input{background:#292627;color:var(--ink);border-color:#776c65;border-radius:4px}
+input::placeholder{color:#bdb3ab}.controls{margin-bottom:34px}
+article{background:transparent;border:0;border-top:1px solid var(--rule);border-radius:0;padding:28px 0;margin:0}
+.meta{color:#c9bfb4;font-size:.78rem;letter-spacing:.05em}
+h2{font-size:clamp(1.8rem,5vw,3.1rem);letter-spacing:-.025em;margin:7px 0}
+summary{font-size:.95rem}section{max-width:66ch;border:0;padding-top:10px;margin-top:20px}
+h3{color:#ff997d;font-size:.95rem;letter-spacing:.07em}
+section p{color:#e7dfd5;margin:.7em 0 1.1em}
+article:target{box-shadow:none;border-top:3px solid #ff7753}
+footer{border-top:1px solid var(--rule);margin-top:45px;padding-top:28px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid #ffae93;outline-offset:5px}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}article{animation:enter .5s ease both}@keyframes enter{from{opacity:.7;transform:translateY(8px)}to{opacity:1;transform:none}}}
+@media(max-width:600px){header{min-height:70svh}body{font-size:17px}.controls{gap:4px}.controls p{margin-top:0}h1{font-size:clamp(3.2rem,14vw,5rem)}}
+
 </style>
 </head>
 <body>
-<header><div><p class="eyebrow">每天認識一個詞彙</p><h1>這個詞是什麼？</h1><p>從白話解釋、生活例子到容易搞混的界線，把看過卻說不清楚的詞，慢慢弄懂。</p></div></header>
-<main>
+<header><div><p class="eyebrow">WORD NOTES / 每天認識一個詞彙</p><h1>這個詞，<br><span>是什麼？</span></h1><p>有些事，你早就遇過。<br>只是還不知道，原來它有個名字。</p><a class="entry-link" href="#word-index">打開詞彙索引 ↓</a></div></header>
+<main id="word-index"><p class="index-kicker">THE INDEX / 從生活裡找一個詞</p>
 <div class="categories" aria-labelledby="category-title"><h2 id="category-title">按主題閱讀</h2><div class="filters" role="group" aria-label="詞彙分類"><button type="button" data-filter="all" aria-pressed="true">全部 <span>20</span></button><button type="button" data-filter="psychology" aria-pressed="false">心理與思考 <span>9</span></button><button type="button" data-filter="urban" aria-pressed="false">城市與空間 <span>3</span></button><button type="button" data-filter="digital" aria-pressed="false">數位生活 <span>2</span></button><button type="button" data-filter="society" aria-pressed="false">社會與日常 <span>2</span></button><button type="button" data-filter="design" aria-pressed="false">設計與無障礙 <span>2</span></button><button type="button" data-filter="everyday" aria-pressed="false">日常經濟 <span>2</span></button></div></div>
 <div class="controls"><label for="search">找詞彙<input id="search" type="search" placeholder="輸入詞彙、分類或關鍵字"></label><p id="count" aria-live="polite">共 20 則</p></div>
 <div id="archive">
