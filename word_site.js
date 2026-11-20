@@ -76,18 +76,22 @@
   const mobile=matchMedia('(max-width:700px)').matches;
   const dots=[...pick.querySelectorAll('.switch-dots i')].filter((_,i)=>!mobile||i===1);
   try{
-   dots.forEach((dot,i)=>pickAnimations.push(animate(dot,[{opacity:0,transform:'translateY(0) scale(1)'},{opacity:1,transform:'translateY(-8px) scale(.9,1.1)',offset:.45},{opacity:0,transform:'translateY(0) scale(1.12,.85)'}],{duration:140,delay:i*70})));
-   const size=Math.max(1,Math.hypot(box.width||pick.offsetWidth,Math.max(from,520))/8+3);
-   const cover=animate(switchOrb,[{transform:'scale(0)'},{transform:'scale('+size+')'}],{duration:180,delay:mobile?100:140,fill:'forwards'});
+   dots.forEach((dot,i)=>pickAnimations.push(animate(dot,[{opacity:0,transform:'translateY(0) scale(1)'},{opacity:1,transform:'translateY(-8px) scale(.9,1.1)',offset:.45},{opacity:0,transform:'translateY(0) scale(1.12,.85)'}],{duration:mobile?200:120,delay:i*60})));
+   const origin=pick.querySelector('.switch-dots i:nth-child(2)').getBoundingClientRect();
+   switchOrb.style.left=(origin.left-box.left+origin.width/2-6)+'px';
+   switchOrb.style.top=(origin.top-box.top+origin.height/2-6)+'px';
+   switchOrb.style.right='auto';
+   const size=Math.max(1,Math.hypot(box.width||pick.offsetWidth,Math.max(from,520))/6+3);
+   const cover=animate(switchOrb,[{transform:'scale(0)'},{transform:'scale('+size+')'}],{duration:160,delay:240,fill:'forwards'});
    pickAnimations.push(cover);
    await cover?.finished.catch(()=>{});
    if(token!==pickVersion)return;
    // Commit all fields once, while the local circle covers the card.
    renderPick(target);pendingPick=null;
    const to=pick.getBoundingClientRect().height;
-   const height=animate(pick,[{height:from+'px'},{height:to+'px'}],{duration:260});
+   const height=animate(pick,[{height:from+'px'},{height:to+'px'}],{duration:200});
    cover?.cancel();
-   const uncover=animate(switchOrb,[{transform:'scale('+size+')'},{transform:'scale(0)'}],{duration:260});
+   const uncover=animate(switchOrb,[{transform:'scale('+size+')'},{transform:'scale(0)'}],{duration:200});
    pickAnimations.push(height,uncover);
    await Promise.all([height,uncover].filter(Boolean).map(a=>a.finished.catch(()=>{})));
   }catch(error){
@@ -208,7 +212,11 @@
   const introDrop=matchMedia('(max-width:700px)').matches?32:64;
   document.querySelectorAll('h1 > span').forEach((line,i)=>entrance.push(animate(line,[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:480,delay:i*100,fill:'backwards'})));
   entrance.push(animate(document.querySelector('.question'),[{opacity:0,transform:'rotate(-14deg) translateY(10px)'},{opacity:1,transform:'rotate(0deg) translateY(0)'}],{duration:400,delay:260,fill:'backwards'}));
-  entrance.push(animate(document.querySelector('.curiosity-dot'),[{transform:'translateY(-'+introDrop+'px) scale(.85,1.12)'},{transform:'translateY(0) scale(1.28,.72)',offset:.52},{transform:'translateY(-12px) scale(.92,1.08)',offset:.72},{transform:'translateY(0) scale(1.08,.92)',offset:.9},{transform:'translateY(0) scale(1)'}],{duration:800}));
+  const heroDot=document.querySelector('.curiosity-dot');
+  const landing=animate(heroDot,[{transform:'translateY(-'+introDrop+'px) scale(.85,1.12)'},{transform:'translateY(0) scale(1.28,.72)',offset:.52},{transform:'translateY(-12px) scale(.92,1.08)',offset:.72},{transform:'translateY(0) scale(1.08,.92)',offset:.9},{transform:'translateY(0) scale(1)'}],{duration:800});
+  entrance.push(landing);
+  const settleDot=()=>{heroDot.style.transform='translateY(0) scale(1)';landing?.cancel()};
+  landing?.finished.then(settleDot,settleDot);
   [['.book',180],['.door',300],['.lens',420]].forEach(([selector,delay])=>entrance.push(animate(document.querySelector('.room-props '+selector),[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:600,delay,fill:'backwards'})));
  }
  // One finite paper turn: curled outer edge, moving crease, soft landing.
