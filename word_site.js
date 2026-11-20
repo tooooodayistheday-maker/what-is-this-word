@@ -278,10 +278,10 @@
  const lensTimer=0;
  const clamp=n=>Math.max(0,Math.min(1,n));
  const storyCaption=document.querySelector('.story-caption'),replay=document.querySelector('.replay-intro');
- let storyEnabled=!location.hash,storyDistance=small.matches?220:360,storyAnchors=null,storyMeasured=false,bookRestAt=0,doorRestAt=0;
+ let storyEnabled=!location.hash,storyDistance=small.matches?360:520,storyAnchors=null,storyMeasured=false,bookRestAt=0,doorRestAt=0;
  function center(el,rx=.5,ry=.5){const r=el.getBoundingClientRect();return {x:r.left+r.width*rx,y:r.top+window.scrollY+r.height*ry}}
  function refreshStoryAnchors(){
-  storyDistance=small.matches?220:360;
+  storyDistance=small.matches?360:520;
   storyAnchors={home:center(guideHome),book:center(document.querySelector('.book-wrap'),.48,.42),door:center(document.querySelector('.door-wrap'),.47,.58),end:center(guideDock)};
  }
  refreshStoryAnchors();
@@ -303,23 +303,25 @@
   // Once user scrolls into the scene, entrance animations yield to the guide.
   entrance.forEach(animation=>animation?.cancel());restPage();clearTimeout(pageTimer);
   let point;
-  if(small.matches){point=leap(a.home,a.end,p,28);storyCaption.style.opacity=String(clamp((p-.25)/.25)*(1-clamp((p-.8)/.2)))}
+  if(small.matches){point=leap(a.home,a.end,p,28)}
   else{
    const now=Date.now();
-   if(p<.4)bookRestAt=0;else if(!bookRestAt)bookRestAt=now;
-   if(p<.7)doorRestAt=0;else if(!doorRestAt)doorRestAt=now;
-   const bookHold=p>=.4&&now-bookRestAt<150,doorHold=p>=.7&&now-doorRestAt<150;
+   if(p<.23)bookRestAt=0;else if(!bookRestAt)bookRestAt=now;
+   if(p<.405)doorRestAt=0;else if(!doorRestAt)doorRestAt=now;
+   const bookHold=p>=.23&&now-bookRestAt<150,doorHold=p>=.405&&now-doorRestAt<150;
    if(bookHold){point={...a.book,sx:1,sy:1};requestPaint()}
    else if(doorHold){point={...a.door,sx:1,sy:1};requestPaint()}
-   else if(p<.4)point=leap(a.home,a.book,p/.4,70);
-   else if(p<.54)point={...a.book,sx:1,sy:1};
-   else if(p<.7)point=leap(a.book,a.door,(p-.54)/.16,28);
-   else if(p<.82)point={...a.door,sx:1,sy:1};
-   else point=leap(a.door,a.end,(p-.82)/.18,45);
+   else if(p<.23)point=leap(a.home,a.book,p/.23,70);
+   else if(p<.31)point={...a.book,sx:1,sy:1};
+   else if(p<.405)point=leap(a.book,a.door,(p-.31)/.095,28);
+   else if(p<.81)point={...a.door,sx:1,sy:1};
+   else point=leap(a.door,a.end,(p-.81)/.19,45);
    // The leaf opens only after the first landing, before the guide crosses it.
-   const opened=clamp((p-.4)/.14);leaf.style.transform=`scaleX(${-2.15+3.15*opened}) skewY(${-5*(1-opened)}deg)`;
-   storyCaption.style.opacity=String(clamp((p-.65)/.1)*(1-clamp((p-.92)/.08)));
+   const opened=clamp((p-.23)/.08);leaf.style.transform=`scaleX(${-2.15+3.15*opened}) skewY(${-5*(1-opened)}deg)`;
   }
+  const quoteStart=small.matches?190:280,quoteFull=small.matches?220:310,quoteEnd=small.matches?300:430,quoteGone=small.matches?330:465;
+  const quoteOpacity=clamp((y-quoteStart)/(quoteFull-quoteStart))*(1-clamp((y-quoteEnd)/(quoteGone-quoteEnd)));
+  storyCaption.style.opacity=String(quoteOpacity);
   if(guideDot.parentElement!==document.body)document.body.append(guideDot);
   guideDot.classList.add('is-travelling');
   guideDot.style.transform=`translate3d(${point.x-9}px,${point.y-y-9}px,0) scale(${point.sx},${point.sy})`;
@@ -352,10 +354,14 @@
    const amplitude=el.classList.contains('lens-wrap')?16:el.classList.contains('door-wrap')?8:el.classList.contains('book-wrap')?4:0;
    const px=motion.matches||!fine.matches?0:mx*amplitude*focusMotion;
    const py=motion.matches||!fine.matches?0:my*amplitude*focusMotion;
-   const phase=storyEnabled&&!motion.matches?Math.max(0,Math.min(1,(y/storyDistance-(el.classList.contains('lens-wrap') ? .55 : el.classList.contains('door-wrap') ? .64 : .72))/.18)):0;
+   const exitStart=mobile?(el.classList.contains('lens-wrap')?105:el.classList.contains('door-wrap')?125:135):(el.classList.contains('lens-wrap')?185:el.classList.contains('door-wrap')?225:230);
+   const phase=storyEnabled&&!motion.matches?clamp((y-exitStart)/40):0;
    el.style.opacity=String(1-phase);
    el.style.transform=motion.matches?'':`translate3d(${px+phase*20}px,${-Math.min(y,roomHeight)*Number(el.dataset.parallax)*(mobile ? 0.2 : 1)+py-phase*12}px,0)`;
   });
+  // Floor and both bottom notes leave with the book, before the quote begins.
+  const floorExit=storyEnabled&&!motion.matches?clamp((y-(mobile?135:230))/40):0;
+  document.querySelectorAll('.floor,.room-note').forEach(el=>{el.style.opacity=String(1-floorExit);el.style.transform=motion.matches?'':`translateY(${floorExit*12}px)`});
   // Opening is driven only by bounded scroll progress, so scrolling up reverses it.
   leaf.style.transform=motion.matches?'':`scaleX(${-2.15+3.15*eased}) skewY(${-5*(1-eased)}deg)`;
   glow.style.opacity=motion.matches?'0':String(.6*eased);

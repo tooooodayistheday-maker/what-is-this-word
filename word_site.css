@@ -178,3 +178,7 @@ article:target{border-color:var(--color-brand)}
 .book-surface .book{filter:drop-shadow(5px 10px 8px color-mix(in srgb,var(--color-brand) 10%,transparent))}
 .room-props .door{filter:drop-shadow(5px 10px 8px color-mix(in srgb,var(--color-brand) 12%,transparent))}
 .room-props .lens{filter:drop-shadow(7px 14px 17px color-mix(in srgb,var(--color-brand) 9%,transparent))}
+
+/* Empty stage first; then a full-opacity paper-white quote, without scenery behind it. */
+.story-caption{top:54%;color:var(--color-paper)}
+@media(max-width:700px){.story-caption{top:auto;bottom:320px}}
