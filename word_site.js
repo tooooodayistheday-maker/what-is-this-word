@@ -55,8 +55,11 @@
 
  const pick=document.querySelector('.home-recommendation'),pickLink=document.querySelector('#recommend-read');
  let recommended=null,pendingPick=null,pickVersion=0,pickAnimations=[];
- const pickContent=pick.querySelector('.recommend-content'),switchOrb=pick.querySelector('.switch-orb');
- function resetSwitch(){pickAnimations.forEach(a=>a?.cancel());pickAnimations=[];pick.style.height='';switchOrb.style.transform='scale(0)'}
+ const pickContent=pick.querySelector('.recommend-content');
+ const guideDot=document.querySelector('.curiosity-dot'),guideHome=document.querySelector('.guide-home'),guideDock=document.querySelector('.guide-dock'),switchDock=document.querySelector('.switch-dock');
+ let guideBusy=false;
+ function dockGuide(parent){parent.append(guideDot);guideDot.classList.remove('is-travelling');guideDot.style.cssText='transform:translateY(0) scale(1)';}
+ function resetSwitch(){pickAnimations.forEach(a=>a?.cancel());pickAnimations=[];pick.style.height='';guideDot.style.transform='translateY(0) scale(1)'}
  function choose(){const pool=cards.filter(card=>card!==(pendingPick||recommended));return pool[Math.floor(Math.random()*pool.length)]||cards[0]}
  function renderPick(card){
   recommended=card;
@@ -70,33 +73,29 @@
  }
  async function recommend(withMotion=true){
   const target=choose(),token=++pickVersion;pendingPick=target;
-  const box=pick.getBoundingClientRect(),from=box.height;
-  resetSwitch();
+  const from=pick.getBoundingClientRect().height;resetSwitch();
   if(!withMotion||motion.matches){renderPick(target);pendingPick=null;return}
+  guideBusy=true;dockGuide(switchDock);
   const mobile=matchMedia('(max-width:700px)').matches;
-  const dots=[...pick.querySelectorAll('.switch-dots i')].filter((_,i)=>!mobile||i===1);
   try{
-   dots.forEach((dot,i)=>pickAnimations.push(animate(dot,[{opacity:0,transform:'translateY(0) scale(1)'},{opacity:1,transform:'translateY(-8px) scale(.9,1.1)',offset:.45},{opacity:0,transform:'translateY(0) scale(1.12,.85)'}],{duration:mobile?200:120,delay:i*60})));
-   const origin=pick.querySelector('.switch-dots i:nth-child(2)').getBoundingClientRect();
-   switchOrb.style.left=(origin.left-box.left+origin.width/2-6)+'px';
-   switchOrb.style.top=(origin.top-box.top+origin.height/2-6)+'px';
-   switchOrb.style.right='auto';
-   const size=Math.max(1,Math.hypot(box.width||pick.offsetWidth,Math.max(from,520))/6+3);
-   const cover=animate(switchOrb,[{transform:'scale(0)'},{transform:'scale('+size+')'}],{duration:160,delay:240,fill:'forwards'});
-   pickAnimations.push(cover);
-   await cover?.finished.catch(()=>{});
+   const hop=animate(guideDot,[
+    {transform:'translateY(0) scale(1)'},
+    {transform:'translateY(2px) scale(1.15,.85)',offset:.12},
+    {transform:'translateY(-4px) scale(.85,1.15)',offset:.22},
+    {transform:'translateY(-'+(mobile?10:18)+'px) scale(.9,1.1)',offset:.45},
+    {transform:'translateY(0) scale(1.2,.8)',offset:.7},
+    {transform:'translateY(0) scale(1)',offset:.74},
+    {transform:'translateY(0) scale(1)'}],{duration:500});
+   const out=animate(pickContent,[{opacity:1,translate:'0 0'},{opacity:0,translate:'0 -8px'}],{duration:120,delay:180,fill:'forwards'});
+   pickAnimations.push(hop,out);await out?.finished.catch(()=>{});
    if(token!==pickVersion)return;
-   // Commit all fields once, while the local circle covers the card.
    renderPick(target);pendingPick=null;
-   const to=pick.getBoundingClientRect().height;
+   const to=pick.getBoundingClientRect().height;out?.cancel();
    const height=animate(pick,[{height:from+'px'},{height:to+'px'}],{duration:200});
-   cover?.cancel();
-   const uncover=animate(switchOrb,[{transform:'scale('+size+')'},{transform:'scale(0)'}],{duration:200});
-   pickAnimations.push(height,uncover);
-   await Promise.all([height,uncover].filter(Boolean).map(a=>a.finished.catch(()=>{})));
-  }catch(error){
-   if(token===pickVersion){renderPick(target);pendingPick=null}
-  }finally{if(token===pickVersion)resetSwitch()}
+   const incoming=animate(pickContent,[{opacity:0,translate:'0 8px'},{opacity:1,translate:'0 0'}],{duration:200});
+   pickAnimations.push(height,incoming);await Promise.all([hop,height,incoming].filter(Boolean).map(a=>a.finished.catch(()=>{})));
+  }catch{if(token===pickVersion){renderPick(target);pendingPick=null}}
+  finally{if(token===pickVersion){resetSwitch();dockGuide(switchDock);guideBusy=false;refreshStoryAnchors()}}
  }
 
  recommend(false);
@@ -107,6 +106,7 @@
   if(!motion.matches)return;
   ++pickVersion;resetSwitch();
   if(pendingPick){renderPick(pendingPick);pendingPick=null}
+  guideBusy=false;dockGuide(guideHome);
  });
 
  const reader=document.querySelector('.reader'),copy=reader.querySelector('.reader-copy'),art=reader.querySelector('.reader-art');
@@ -157,7 +157,7 @@
  function enter(card,trigger){
   if(typeof reader.showModal!=='function'){location.hash=card.id;return}
   active=card;beat=0;turning=false;closing=false;version++;returnFocus=trigger;oldOverflow=document.body.style.overflow;
-  readerOrbAnimation?.cancel();scene();document.querySelector('.word-slip').classList.remove('is-readable');document.querySelector('.word-slip').inert=true;reader.showModal();document.body.style.overflow='hidden';close.focus();
+  readerOrbAnimation?.cancel();scene();guideDot.hidden=true;document.querySelector('.word-slip').classList.remove('is-readable');document.querySelector('.word-slip').inert=true;reader.showModal();document.body.style.overflow='hidden';close.focus();
   dialogAnimation?.cancel();dialogAnimation=animate(reader,[{opacity:0,translate:'0 15px'},{opacity:1,translate:'0 0'}],{duration:200});
   track('word_reader_open',meta(card));
  }
@@ -167,7 +167,7 @@
   dialogAnimation=animate(reader,[{opacity:1,translate:'0 0'},{opacity:0,translate:'0 10px'}],{duration:160});
   await dialogAnimation?.finished.catch(()=>{});
   if(token!==version)return;
-  reader.close();document.body.style.overflow=oldOverflow;closing=false;
+  reader.close();guideDot.hidden=false;document.body.style.overflow=oldOverflow;closing=false;
   if(returnFocus?.id==='slip-read'){
    if(canShowNote()){setNote(true);slip.style.setProperty('--title-reveal','1');slip.style.setProperty('--slip-enter','1');returnFocus.focus({preventScroll:true})}
    else pickLink.focus({preventScroll:true});
@@ -215,7 +215,7 @@
   const heroDot=document.querySelector('.curiosity-dot');
   const landing=animate(heroDot,[{transform:'translateY(-'+introDrop+'px) scale(.85,1.12)'},{transform:'translateY(0) scale(1.28,.72)',offset:.52},{transform:'translateY(-12px) scale(.92,1.08)',offset:.72},{transform:'translateY(0) scale(1.08,.92)',offset:.9},{transform:'translateY(0) scale(1)'}],{duration:800});
   entrance.push(landing);
-  const settleDot=()=>{heroDot.style.transform='translateY(0) scale(1)';landing?.cancel()};
+  const settleDot=()=>{if(heroDot.parentElement===guideHome)heroDot.style.transform='translateY(0) scale(1)';landing?.cancel()};
   landing?.finished.then(settleDot,settleDot);
   [['.book',180],['.door',300],['.lens',420]].forEach(([selector,delay])=>entrance.push(animate(document.querySelector('.room-props '+selector),[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:600,delay,fill:'backwards'})));
  }
@@ -275,8 +275,68 @@
   lensAnimation=animate(lens,[{transform:'rotate(-18deg) scale(1)'},{transform:'rotate(-9deg) scale(1.13)',offset:.5},{transform:'rotate(-18deg) scale(1)'}],{duration:1100});
  }
  document.querySelector('.lens-wrap')?.addEventListener('pointerenter',()=>{if(fine.matches)magnify()});
- const lensTimer=!location.hash&&!motion.matches?setTimeout(magnify,1700):0;
+ const lensTimer=0;
  const clamp=n=>Math.max(0,Math.min(1,n));
+ const storyCaption=document.querySelector('.story-caption'),replay=document.querySelector('.replay-intro');
+ let storyEnabled=!location.hash,storyDistance=small.matches?220:360,storyAnchors=null,storyMeasured=false,bookRestAt=0,doorRestAt=0;
+ function center(el,rx=.5,ry=.5){const r=el.getBoundingClientRect();return {x:r.left+r.width*rx,y:r.top+window.scrollY+r.height*ry}}
+ function refreshStoryAnchors(){
+  storyDistance=small.matches?220:360;
+  storyAnchors={home:center(guideHome),book:center(document.querySelector('.book-wrap'),.48,.42),door:center(document.querySelector('.door-wrap'),.47,.58),end:center(guideDock)};
+ }
+ refreshStoryAnchors();
+ function leap(a,b,t,height){
+  t=Math.max(0,Math.min(1,t));
+  if(t<.12)return {...a,sx:1+.15*t/.12,sy:1-.15*t/.12};
+  if(t>.8)return {...b,sx:t<.9?1.2-(t-.8)*2:1,sy:t<.9?.8+(t-.8)*2:1};
+  const u=(t-.12)/.68;
+  return {x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u-Math.sin(Math.PI*u)*height,sx:.85+.15*u,sy:1.15-.15*u};
+ }
+ function paintStory(y){
+  if(guideBusy||reader.open)return;
+  if(!storyEnabled||motion.matches){storyCaption.style.opacity='0';if(guideDot.parentElement!==switchDock)dockGuide(location.hash==='#recommendation'?guideDock:guideHome);return}
+  const p=clamp(y/storyDistance);
+  if(p>0&&p<1&&!storyMeasured){entrance.forEach(animation=>animation?.cancel());refreshStoryAnchors();storyMeasured=true}
+  const a=storyAnchors;
+  if(p===0){bookRestAt=doorRestAt=0;dockGuide(guideHome);storyCaption.style.opacity='0';return}
+  if(p>=1){if(guideDot.parentElement!==switchDock)dockGuide(guideDock);storyCaption.style.opacity='0';return}
+  // Once user scrolls into the scene, entrance animations yield to the guide.
+  entrance.forEach(animation=>animation?.cancel());restPage();clearTimeout(pageTimer);
+  let point;
+  if(small.matches){point=leap(a.home,a.end,p,28);storyCaption.style.opacity=String(clamp((p-.25)/.25)*(1-clamp((p-.8)/.2)))}
+  else{
+   const now=Date.now();
+   if(p<.4)bookRestAt=0;else if(!bookRestAt)bookRestAt=now;
+   if(p<.7)doorRestAt=0;else if(!doorRestAt)doorRestAt=now;
+   const bookHold=p>=.4&&now-bookRestAt<150,doorHold=p>=.7&&now-doorRestAt<150;
+   if(bookHold){point={...a.book,sx:1,sy:1};requestPaint()}
+   else if(doorHold){point={...a.door,sx:1,sy:1};requestPaint()}
+   else if(p<.4)point=leap(a.home,a.book,p/.4,70);
+   else if(p<.54)point={...a.book,sx:1,sy:1};
+   else if(p<.7)point=leap(a.book,a.door,(p-.54)/.16,28);
+   else if(p<.82)point={...a.door,sx:1,sy:1};
+   else point=leap(a.door,a.end,(p-.82)/.18,45);
+   // The leaf opens only after the first landing, before the guide crosses it.
+   const opened=clamp((p-.4)/.14);leaf.style.transform=`scaleX(${-2.15+3.15*opened}) skewY(${-5*(1-opened)}deg)`;
+   storyCaption.style.opacity=String(clamp((p-.65)/.1)*(1-clamp((p-.92)/.08)));
+  }
+  if(guideDot.parentElement!==document.body)document.body.append(guideDot);
+  guideDot.classList.add('is-travelling');
+  guideDot.style.transform=`translate3d(${point.x-9}px,${point.y-y-9}px,0) scale(${point.sx},${point.sy})`;
+  document.querySelector('.lens-wrap').style.setProperty('--lens-shadow-opacity',String(.06+.04*(1-Math.sin(Math.PI*p))));
+  document.querySelector('.lens-wrap').style.setProperty('--lens-shadow-scale',String(.72+.18*(1-Math.sin(Math.PI*p))));
+ }
+ replay.hidden=false;
+ replay.addEventListener('click',()=>{
+  resetSwitch();guideBusy=false;storyEnabled=true;storyMeasured=false;bookRestAt=doorRestAt=0;noteDismissed=false;entrance.forEach(a=>a?.cancel());
+  dockGuide(guideHome);refreshStoryAnchors();window.scrollTo({top:0,behavior:'instant'});requestPaint();
+  replay.textContent='往下捲動，重看圓點帶路 ↘';
+ });
+ addEventListener('hashchange',()=>{
+  if(location.hash&&location.hash!=='#top'){storyEnabled=false;entrance.forEach(a=>a?.cancel());if(!guideBusy)dockGuide(location.hash==='#recommendation'?guideDock:guideHome);requestPaint()}
+  else if(location.hash==='#top'){storyEnabled=true;requestPaint()}
+ });
+
  function paint(){
   raf=0;if(document.hidden)return;
   const y=Math.max(0,window.scrollY),mobile=small.matches;
@@ -286,17 +346,20 @@
   const progress=clamp((y-start)/Math.min(110,viewport*.12));
   const eased=progress*progress*(3-2*progress);
   const release=clamp((y-start-Math.min(110,viewport*.12))/Math.min(90,viewport*.1));
-  const focusMotion=progress>0&&release<1 ? .18 : 1;
+  const focusMotion=storyEnabled&&y>10&&y<storyDistance ? .12 : 1;
   if(progress>0&&release<1){clearTimeout(pageTimer);clearTimeout(lensTimer);restPage();lensAnimation?.cancel()}
   layers.forEach(el=>{
    const amplitude=el.classList.contains('lens-wrap')?16:el.classList.contains('door-wrap')?8:el.classList.contains('book-wrap')?4:0;
    const px=motion.matches||!fine.matches?0:mx*amplitude*focusMotion;
    const py=motion.matches||!fine.matches?0:my*amplitude*focusMotion;
-   el.style.transform=motion.matches?'':`translate3d(${px}px,${-Math.min(y,roomHeight)*Number(el.dataset.parallax)*(mobile ? 0.2 : 1)+py}px,0)`;
+   const phase=storyEnabled&&!motion.matches?Math.max(0,Math.min(1,(y/storyDistance-(el.classList.contains('lens-wrap') ? .55 : el.classList.contains('door-wrap') ? .64 : .72))/.18)):0;
+   el.style.opacity=String(1-phase);
+   el.style.transform=motion.matches?'':`translate3d(${px+phase*20}px,${-Math.min(y,roomHeight)*Number(el.dataset.parallax)*(mobile ? 0.2 : 1)+py-phase*12}px,0)`;
   });
   // Opening is driven only by bounded scroll progress, so scrolling up reverses it.
   leaf.style.transform=motion.matches?'':`scaleX(${-2.15+3.15*eased}) skewY(${-5*(1-eased)}deg)`;
   glow.style.opacity=motion.matches?'0':String(.6*eased);
+  paintStory(y);
   const now=Date.now();
   const reached=release>0;
   if(y<start*.6){noteSeenAt=0;noteDismissed=false;clearTimeout(noteTimer);clearTimeout(noteRevealTimer);setNote(false)}
@@ -334,13 +397,8 @@
    revealedSections.add(entry.target);
    sectionObserver?.unobserve(entry.target);
    if(motion.matches)continue;
-   const mobile=small.matches;
-   entry.target.querySelectorAll('.section-dots i').forEach((dot,i)=>{
-    if(mobile&&i!==1)return;
-    sectionEntrance.push(animate(dot,[{transform:'translateY(0) scale(1)'},{transform:'translateY(-9px) scale(.9,1.1)',offset:.45},{transform:'translateY(0) scale(1.15,.8)',offset:.8},{transform:'none'}],{duration:260,delay:mobile?0:i*70}));
-   });
-   sectionEntrance.push(animate(entry.target.querySelector('.selection-side h2'),[{opacity:.5,translate:'0 12px'},{opacity:1,translate:'0 0'}],{duration:220,delay:160}));
-   sectionEntrance.push(animate(pick,[{opacity:.65,translate:'0 14px'},{opacity:1,translate:'0 0'}],{duration:240,delay:200}));
+   sectionEntrance.push(animate(entry.target.querySelector('.selection-side h2'),[{opacity:.5,translate:'0 12px'},{opacity:1,translate:'0 0'}],{duration:220}));
+   sectionEntrance.push(animate(pick,[{opacity:.65,translate:'0 14px'},{opacity:1,translate:'0 0'}],{duration:240,delay:70}));
   }
  },{threshold:.12}):null;
  sectionObserver?.observe(document.querySelector('.selection'));
@@ -352,7 +410,7 @@
  recommendationObserver?.observe(pick);
  slip.addEventListener('focusin',()=>{clearTimeout(noteTimer);slip.style.setProperty('--title-reveal','1')});
  addEventListener('scroll',requestPaint,{passive:true});
- addEventListener('resize',()=>{placeNote();roomHeight=room.offsetHeight;roomWidth=room.offsetWidth;doorAnchor=document.querySelector('.door-wrap').getBoundingClientRect();doorAnchor={...doorAnchor,top:doorAnchor.top+window.scrollY,left:doorAnchor.left,width:doorAnchor.width,height:doorAnchor.height};requestPaint()},{passive:true});
+ addEventListener('resize',()=>{placeNote();roomHeight=room.offsetHeight;roomWidth=room.offsetWidth;doorAnchor=document.querySelector('.door-wrap').getBoundingClientRect();doorAnchor={...doorAnchor,top:doorAnchor.top+window.scrollY,left:doorAnchor.left,width:doorAnchor.width,height:doorAnchor.height};refreshStoryAnchors();requestPaint()},{passive:true});
  document.addEventListener('visibilitychange',()=>{
   if(document.hidden){cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);clearTimeout(noteTimer);clearTimeout(insightTimer);lensMessage.classList.remove('is-visible');setNote(false);restPage();lensAnimation?.cancel();entrance.forEach(a=>a?.cancel())}
   else requestPaint();
