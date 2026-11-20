@@ -55,7 +55,8 @@
 
  const pick=document.querySelector('.home-recommendation'),pickLink=document.querySelector('#recommend-read');
  let recommended=null,pendingPick=null,pickVersion=0,pickAnimations=[];
- const pickContent=pick.querySelector('.recommend-content');
+ const pickContent=pick.querySelector('.recommend-content'),switchOrb=pick.querySelector('.switch-orb');
+ function resetSwitch(){pickAnimations.forEach(a=>a?.cancel());pickAnimations=[];pick.style.height='';switchOrb.style.transform='scale(0)'}
  function choose(){const pool=cards.filter(card=>card!==(pendingPick||recommended));return pool[Math.floor(Math.random()*pool.length)]||cards[0]}
  function renderPick(card){
   recommended=card;
@@ -69,40 +70,62 @@
  }
  async function recommend(withMotion=true){
   const target=choose(),token=++pickVersion;pendingPick=target;
-  const from=pick.getBoundingClientRect().height;
-  pickAnimations.forEach(a=>a?.cancel());pickAnimations=[];pick.style.height='';
+  const box=pick.getBoundingClientRect(),from=box.height;
+  resetSwitch();
   if(!withMotion||motion.matches){renderPick(target);pendingPick=null;return}
-  const out=animate(pickContent,[{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-12px)'}],{duration:160,fill:'forwards'});
-  pickAnimations.push(out);
-  await out?.finished.catch(()=>{});
-  if(token!==pickVersion)return;
-  renderPick(target);pendingPick=null;
-  const to=pick.getBoundingClientRect().height;
-  out?.cancel();
-  const height=animate(pick,[{height:from+'px'},{height:to+'px'}],{duration:260});
-  const arrival=animate(pickContent,[{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'translateY(0)'}],{duration:260});
-  pickAnimations=[height,arrival];
-  await Promise.all(pickAnimations.filter(Boolean).map(a=>a.finished.catch(()=>{})));
-  if(token===pickVersion){pickAnimations=[];pick.style.height=''}
+  const mobile=matchMedia('(max-width:700px)').matches;
+  const dots=[...pick.querySelectorAll('.switch-dots i')].filter((_,i)=>!mobile||i===1);
+  try{
+   dots.forEach((dot,i)=>pickAnimations.push(animate(dot,[{opacity:0,transform:'translateY(0) scale(1)'},{opacity:1,transform:'translateY(-8px) scale(.9,1.1)',offset:.45},{opacity:0,transform:'translateY(0) scale(1.12,.85)'}],{duration:140,delay:i*70})));
+   const size=Math.max(1,Math.hypot(box.width||pick.offsetWidth,Math.max(from,520))/8+3);
+   const cover=animate(switchOrb,[{transform:'scale(0)'},{transform:'scale('+size+')'}],{duration:180,delay:mobile?100:140,fill:'forwards'});
+   pickAnimations.push(cover);
+   await cover?.finished.catch(()=>{});
+   if(token!==pickVersion)return;
+   // Commit all fields once, while the local circle covers the card.
+   renderPick(target);pendingPick=null;
+   const to=pick.getBoundingClientRect().height;
+   const height=animate(pick,[{height:from+'px'},{height:to+'px'}],{duration:260});
+   cover?.cancel();
+   const uncover=animate(switchOrb,[{transform:'scale('+size+')'},{transform:'scale(0)'}],{duration:260});
+   pickAnimations.push(height,uncover);
+   await Promise.all([height,uncover].filter(Boolean).map(a=>a.finished.catch(()=>{})));
+  }catch(error){
+   if(token===pickVersion){renderPick(target);pendingPick=null}
+  }finally{if(token===pickVersion)resetSwitch()}
  }
+
  recommend(false);
  document.querySelector('#recommend-another').hidden=false;
  document.querySelector('#recommend-another').addEventListener('click',()=>{recommend();track('word_recommendation_change',meta(pendingPick||recommended))});
  document.querySelector('.nav-random').addEventListener('click',()=>{recommend();track('word_recommendation_change',meta(pendingPick||recommended))});
  motion.addEventListener('change',()=>{
   if(!motion.matches)return;
-  ++pickVersion;pickAnimations.forEach(a=>a?.cancel());pickAnimations=[];pick.style.height='';
+  ++pickVersion;resetSwitch();
   if(pendingPick){renderPick(pendingPick);pendingPick=null}
  });
 
  const reader=document.querySelector('.reader'),copy=reader.querySelector('.reader-copy'),art=reader.querySelector('.reader-art');
  const prev=reader.querySelector('#reader-prev'),next=reader.querySelector('#reader-next'),close=reader.querySelector('#reader-close');
- let active=null,beat=0,turning=false,version=0,returnFocus=null,oldOverflow='',running=[],closing=false,dialogAnimation=null;
+ let active=null,beat=0,turning=false,version=0,returnFocus=null,oldOverflow='',running=[],closing=false,dialogAnimation=null,readerOrbAnimation=null;
  const files=['reading-book-v2.png','reading-door-v2.png','reading-lens-v2.png'];
  function animate(el,frames,opts={}){
   if(motion.matches||!el?.animate)return null;
-  const a=el.animate(frames,{duration:440,easing:'cubic-bezier(.22,1,.36,1)',...opts});
-  return a;
+  try{return el.animate(frames,{duration:440,easing:'cubic-bezier(.22,1,.36,1)',...opts})}catch{return null}
+ }
+ function positionReaderDot(from,to,play=false){
+  const dot=reader.querySelector('.reader-orb'),track=reader.querySelector('.reader-progress');
+  const width=track.getBoundingClientRect().width||reader.clientWidth||300;
+  const x=n=>Math.max(0,width-14)*n/2;
+  dot.style.transform='translate3d('+x(to)+'px,0,0)';
+  if(play){
+   readerOrbAnimation?.cancel();const jump=matchMedia('(max-width:700px)').matches?7:12;
+   readerOrbAnimation=animate(dot,[
+    {transform:'translate3d('+x(from)+'px,0,0) scale(1)'},
+    {transform:'translate3d('+((x(from)+x(to))/2)+'px,-'+jump+'px,0) scale(.9,1.1)',offset:.48},
+    {transform:'translate3d('+x(to)+'px,0,0) scale(1.2,.76)',offset:.8},
+    {transform:'translate3d('+x(to)+'px,0,0) scale(1)'}],{duration:400});
+  }
  }
  function stopScene(){running.forEach(a=>a?.cancel());running=[]}
  function scene(direction=1){
@@ -121,22 +144,22 @@
   reader.querySelector('#reader-label').textContent=active.querySelector('.term-number').textContent+' / '+active.querySelector('.term-category').textContent;
   reader.querySelector('#reader-position').textContent=(beat+1)+' / 3';
   reader.querySelector('.reader-progress span').style.transform='scaleX('+((beat+1)/3)+')';
-  prev.disabled=beat===0;next.disabled=beat===2;
-  const shift=matchMedia('(max-width:700px)').matches?20:42;
-  running.push(animate(copy,[{opacity:0,transform:'translateX('+(direction*shift)+'px)'},{opacity:1,transform:'none'}],{duration:260}));
-  running.push(animate(img,[{opacity:0,transform:'translateX('+(direction*shift)+'px)'},{opacity:1,transform:'none'}],{duration:260}));
+  prev.disabled=beat===0;next.disabled=beat===2;positionReaderDot(beat,beat);
+  const shift=matchMedia('(max-width:700px)').matches?12:24;
+  running.push(animate(copy,[{opacity:0,transform:'translateX('+(direction*shift)+'px)'},{opacity:1,transform:'none'}],{duration:240}));
+  running.push(animate(img,[{opacity:0,transform:'translateX('+(direction*shift)+'px)'},{opacity:1,transform:'none'}],{duration:240}));
   reader.scrollTop=0;
  }
  function enter(card,trigger){
   if(typeof reader.showModal!=='function'){location.hash=card.id;return}
   active=card;beat=0;turning=false;closing=false;version++;returnFocus=trigger;oldOverflow=document.body.style.overflow;
-  scene();document.querySelector('.word-slip').classList.remove('is-readable');document.querySelector('.word-slip').inert=true;reader.showModal();document.body.style.overflow='hidden';close.focus();
+  readerOrbAnimation?.cancel();scene();document.querySelector('.word-slip').classList.remove('is-readable');document.querySelector('.word-slip').inert=true;reader.showModal();document.body.style.overflow='hidden';close.focus();
   dialogAnimation?.cancel();dialogAnimation=animate(reader,[{opacity:0,translate:'0 15px'},{opacity:1,translate:'0 0'}],{duration:200});
   track('word_reader_open',meta(card));
  }
  async function exit(){
   if(closing||!reader.open)return;
-  closing=true;const token=++version;turning=false;stopScene();dialogAnimation?.cancel();
+  closing=true;const token=++version;turning=false;stopScene();readerOrbAnimation?.cancel();dialogAnimation?.cancel();
   dialogAnimation=animate(reader,[{opacity:1,translate:'0 0'},{opacity:0,translate:'0 10px'}],{duration:160});
   await dialogAnimation?.finished.catch(()=>{});
   if(token!==version)return;
@@ -148,10 +171,10 @@
  }
  async function turn(delta){
   const target=beat+delta;if(!reader.open||closing||turning||target<0||target>2)return;
-  turning=true;const token=++version;
+  turning=true;const token=++version;positionReaderDot(beat,target,true);
   try{
-   const a=animate(copy,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX('+(-delta*35)+'px)'}],{duration:180});
-   const b=animate(art,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX('+(-delta*65)+'px) rotate('+(-delta*6)+'deg)'}],{duration:180});
+   const a=animate(copy,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX('+(-delta*18)+'px)'}],{duration:160});
+   const b=animate(art,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX('+(-delta*24)+'px) rotate('+(-delta*6)+'deg)'}],{duration:160});
    running.push(a,b);
    await Promise.all([a,b].filter(Boolean).map(x=>x.finished.catch(()=>{})));
    if(!reader.open||token!==version)return;
@@ -182,8 +205,10 @@
  // Distinct title lines and objects arrive in under 1.2 seconds; controls stay live.
  const entrance=[];
  if(!location.hash&&!motion.matches){
+  const introDrop=matchMedia('(max-width:700px)').matches?32:64;
   document.querySelectorAll('h1 > span').forEach((line,i)=>entrance.push(animate(line,[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:480,delay:i*100,fill:'backwards'})));
   entrance.push(animate(document.querySelector('.question'),[{opacity:0,transform:'rotate(-14deg) translateY(10px)'},{opacity:1,transform:'rotate(0deg) translateY(0)'}],{duration:400,delay:260,fill:'backwards'}));
+  entrance.push(animate(document.querySelector('.curiosity-dot'),[{transform:'translateY(-'+introDrop+'px) scale(.85,1.12)'},{transform:'translateY(0) scale(1.28,.72)',offset:.52},{transform:'translateY(-12px) scale(.92,1.08)',offset:.72},{transform:'translateY(0) scale(1.08,.92)',offset:.9},{transform:'translateY(0) scale(1)'}],{duration:800}));
   [['.book',180],['.door',300],['.lens',420]].forEach(([selector,delay])=>entrance.push(animate(document.querySelector('.room-props '+selector),[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:600,delay,fill:'backwards'})));
  }
  // One finite paper turn: curled outer edge, moving crease, soft landing.
@@ -294,6 +319,24 @@
   if(visible)requestPaint();else{cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);restPage();lensAnimation?.cancel()}
  }):null;
  observer?.observe(room);
+ const sectionEntrance=[],revealedSections=new WeakSet();
+ const sectionObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{
+  for(const entry of entries){
+   if(!entry.isIntersecting||revealedSections.has(entry.target))continue;
+   revealedSections.add(entry.target);
+   sectionObserver?.unobserve(entry.target);
+   if(motion.matches)continue;
+   const mobile=small.matches;
+   entry.target.querySelectorAll('.section-dots i').forEach((dot,i)=>{
+    if(mobile&&i!==1)return;
+    sectionEntrance.push(animate(dot,[{transform:'translateY(0) scale(1)'},{transform:'translateY(-9px) scale(.9,1.1)',offset:.45},{transform:'translateY(0) scale(1.15,.8)',offset:.8},{transform:'none'}],{duration:260,delay:mobile?0:i*70}));
+   });
+   sectionEntrance.push(animate(entry.target.querySelector('.selection-side h2'),[{opacity:.5,translate:'0 12px'},{opacity:1,translate:'0 0'}],{duration:220,delay:160}));
+   sectionEntrance.push(animate(pick,[{opacity:.65,translate:'0 14px'},{opacity:1,translate:'0 0'}],{duration:240,delay:200}));
+  }
+ },{threshold:.12}):null;
+ sectionObserver?.observe(document.querySelector('.selection'));
+
  const recommendationObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{
   recommendationVisible=entries[0].isIntersecting;
   if(recommendationVisible){clearTimeout(noteTimer);clearTimeout(noteRevealTimer);setNote(false)}else requestPaint();
@@ -307,7 +350,7 @@
   else requestPaint();
  });
  motion.addEventListener('change',()=>{
-  if(motion.matches){stopScene();restPage();filterAnimation?.cancel();dialogAnimation?.cancel();entrance.forEach(a=>a?.cancel());clearTimeout(lensTimer);lensAnimation?.cancel()}
+  if(motion.matches){readerOrbAnimation?.cancel();sectionEntrance.forEach(a=>a?.cancel());stopScene();restPage();filterAnimation?.cancel();dialogAnimation?.cancel();entrance.forEach(a=>a?.cancel());clearTimeout(lensTimer);lensAnimation?.cancel()}
   requestPaint();
  });
  requestPaint();
