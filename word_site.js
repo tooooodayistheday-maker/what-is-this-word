@@ -66,6 +66,7 @@
   document.querySelector('#recommend-title').textContent=card.querySelector('h2').textContent;
   document.querySelector('#recommend-text').textContent=lead?.textContent||'打開筆記，一起認識這個詞。';
   pickLink.setAttribute('href','#'+card.id);
+  document.querySelector('#slip-read').setAttribute('href','#'+card.id);
   document.querySelector('#slip-title').textContent=card.querySelector('h2').textContent;
  }
  async function recommend(withMotion=true){
@@ -131,7 +132,7 @@
  function enter(card,trigger){
   if(typeof reader.showModal!=='function'){location.hash=card.id;return}
   active=card;beat=0;turning=false;closing=false;version++;returnFocus=trigger;oldOverflow=document.body.style.overflow;
-  scene();reader.showModal();document.body.style.overflow='hidden';close.focus();
+  scene();document.querySelector('.word-slip').classList.remove('is-readable');document.querySelector('.word-slip').inert=true;reader.showModal();document.body.style.overflow='hidden';close.focus();
   dialogAnimation?.cancel();dialogAnimation=animate(reader,[{opacity:0,translate:'0 15px'},{opacity:1,translate:'0 0'}],{duration:200});
   track('word_reader_open',meta(card));
  }
@@ -142,6 +143,7 @@
   await dialogAnimation?.finished.catch(()=>{});
   if(token!==version)return;
   reader.close();document.body.style.overflow=oldOverflow;closing=false;
+  if(returnFocus?.id==='slip-read'){clearTimeout(noteTimer);setNote(true);slip.style.setProperty('--title-reveal','1');slip.style.setProperty('--slip-enter','1')}
   returnFocus?.focus({preventScroll:true});
  }
  async function turn(delta){
@@ -162,6 +164,7 @@
   b.addEventListener('click',()=>enter(card,b));
  });
  pickLink.addEventListener('click',event=>{if(typeof reader.showModal==='function'){event.preventDefault();enter(recommended,pickLink)}});
+ document.querySelector('#slip-read').addEventListener('click',event=>{if(typeof reader.showModal==='function'){event.preventDefault();enter(recommended,event.currentTarget)}});
  document.querySelector('.start-reading').addEventListener('click',event=>{if(typeof reader.showModal==='function'){event.preventDefault();enter(recommended,event.currentTarget)}});
  prev.addEventListener('click',()=>turn(-1));next.addEventListener('click',()=>turn(1));close.addEventListener('click',exit);
  reader.addEventListener('cancel',event=>{event.preventDefault();exit()});
@@ -208,9 +211,21 @@
 
  // Scroll narrative: fixed frame + independent clipped leaf, a note and doorway light.
  const room=document.querySelector('.room'),leaf=document.querySelector('.door-leaf'),lens=document.querySelector('.room-props .lens');
- const slip=document.querySelector('.word-slip'),glow=document.querySelector('.door-glow');
+ const slip=document.querySelector('.word-slip'),glow=document.querySelector('.door-glow'),question=document.querySelector('.question'),lensMessage=document.querySelector('.lens-message');
+ let noteSeenAt=0,noteDismissed=false,noteTimer=0,noteActive=false,insightTimer=0,noteRevealTimer=0;
+ const setNote=show=>{noteActive=show;slip.classList.toggle('is-readable',show);slip.inert=!show;slip.setAttribute('aria-hidden',String(!show))};
+ setNote(false);
+ document.querySelector('.slip-dismiss').addEventListener('click',()=>{noteDismissed=true;setNote(false);document.querySelector('.nav-random').focus({preventScroll:true})});
+ function insight(){
+  clearTimeout(insightTimer);lensMessage.classList.add('is-visible');
+  animate(question,[{transform:'rotate(0deg)'},{transform:'rotate(9deg)',offset:.45},{transform:'rotate(0deg)'}],{duration:450});
+  magnify();insightTimer=setTimeout(()=>lensMessage.classList.remove('is-visible'),1800);
+ }
+ question.addEventListener('pointerenter',()=>{if(fine.matches)insight()});
+ question.addEventListener('focus',insight);question.addEventListener('click',insight);
  const layers=[...document.querySelectorAll('[data-parallax]')];
  const small=matchMedia('(max-width:700px)'),fine=matchMedia('(hover:hover) and (pointer:fine)');
+ let doorAnchor=document.querySelector('.door-wrap').getBoundingClientRect();
  let lensAnimation=null,roomHeight=room.offsetHeight,roomWidth=room.offsetWidth,raf=0,mx=0,my=0,inside=false,visible=true;
  function magnify(){
   if(motion.matches||lensAnimation?.playState==='running')return;
@@ -220,24 +235,44 @@
  const lensTimer=!location.hash&&!motion.matches?setTimeout(magnify,1700):0;
  const clamp=n=>Math.max(0,Math.min(1,n));
  function paint(){
-  raf=0;if(document.hidden||!visible)return;
+  raf=0;if(document.hidden)return;
   const y=Math.max(0,window.scrollY),mobile=small.matches;
-  const progress=clamp((y-roomHeight*(mobile ? 0.1 : 0.12))/Math.min(520,roomHeight*.62));
-  const eased=progress*progress*(3-2*progress),amount=motion.matches?0:eased;
+  const viewport=window.innerHeight||860;
+  // Begin when 78% of the first screen remains; finish opening by 66%.
+  const start=Math.min(roomHeight*.16,viewport*.22);
+  const progress=clamp((y-start)/Math.min(110,viewport*.12));
+  const eased=progress*progress*(3-2*progress);
+  const release=clamp((y-start-Math.min(110,viewport*.12))/Math.min(90,viewport*.1));
+  const focusMotion=progress>0&&release<1 ? .18 : 1;
+  if(progress>0&&release<1){clearTimeout(pageTimer);clearTimeout(lensTimer);restPage();lensAnimation?.cancel()}
   layers.forEach(el=>{
    const amplitude=el.classList.contains('lens-wrap')?16:el.classList.contains('door-wrap')?8:el.classList.contains('book-wrap')?4:0;
-   const px=motion.matches||!fine.matches?0:mx*amplitude;
-   const py=motion.matches||!fine.matches?0:my*amplitude;
+   const px=motion.matches||!fine.matches?0:mx*amplitude*focusMotion;
+   const py=motion.matches||!fine.matches?0:my*amplitude*focusMotion;
    el.style.transform=motion.matches?'':`translate3d(${px}px,${-Math.min(y,roomHeight)*Number(el.dataset.parallax)*(mobile ? 0.2 : 1)+py}px,0)`;
   });
   // Opening is driven only by bounded scroll progress, so scrolling up reverses it.
   leaf.style.transform=motion.matches?'':`scaleX(${-2.15+3.15*eased}) skewY(${-5*(1-eased)}deg)`;
   glow.style.opacity=motion.matches?'0':String(.6*eased);
-  const release=clamp((amount-.18)/.7);
-  slip.style.opacity=motion.matches?'0':String(clamp(release*3)*(1-clamp((progress-.88)/.12)));
-  slip.style.transform=`translate3d(${-28*release}px,${(mobile?75:160)*release}px,0) rotate(${-12*release}deg) scale(${.65+.35*release})`;
+  const now=Date.now();
+  const reached=release>0;
+  if(y<start*.6){noteSeenAt=0;noteDismissed=false;clearTimeout(noteTimer);clearTimeout(noteRevealTimer);setNote(false)}
+  else if(reached&&!noteDismissed&&!reader.open){
+   if(!noteSeenAt){noteSeenAt=now;noteRevealTimer=setTimeout(()=>{if(noteActive){slip.style.setProperty('--title-reveal','1');slip.style.setProperty('--slip-enter','1');slip.style.setProperty('--slip-x','0px');slip.style.setProperty('--slip-y','0px')}},450)}
+   // A brief reading hold survives a fast fling without trapping normal scrolling.
+   const inStory=y<roomHeight+100,holding=now-noteSeenAt<2200;
+   setNote(inStory||holding);
+   const reveal=motion.matches?1:Math.max(clamp(release*1.8),clamp((now-noteSeenAt)/450));
+   slip.style.setProperty('--slip-enter',String(reveal));
+   slip.style.setProperty('--slip-x',((1-reveal)*(doorAnchor.left+doorAnchor.width*.5-((window.innerWidth||roomWidth)-(mobile?16:28)-(mobile?228:248)/2)))+'px');
+   slip.style.setProperty('--slip-y',((1-reveal)*(doorAnchor.top+doorAnchor.height*.55-y-((window.innerHeight||860)-(mobile?16:28)-90)))+'px');
+   slip.style.setProperty('--title-reveal',String(motion.matches?1:Math.max(clamp((release-.42)/.4),clamp((now-noteSeenAt-160)/290))));
+   clearTimeout(noteTimer);
+   if(holding)noteTimer=setTimeout(()=>{if(window.scrollY>=roomHeight+100&&!slip.contains(document.activeElement))setNote(false)},2250-(now-noteSeenAt));
+  }else if(reader.open)setNote(false);
+
  }
- function requestPaint(){if(!raf&&!document.hidden&&visible)raf=requestAnimationFrame(paint)}
+ function requestPaint(){if(!raf&&!document.hidden)raf=requestAnimationFrame(paint)}
  room.addEventListener('pointermove',event=>{
   if(!fine.matches||motion.matches||!inside||!visible||document.hidden)return;
   mx=(event.clientX/roomWidth-.5)*2;my=((event.clientY+scrollY)/roomHeight-.5)*2;requestPaint();
@@ -249,10 +284,11 @@
   if(visible)requestPaint();else{cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);restPage();lensAnimation?.cancel()}
  }):null;
  observer?.observe(room);
+ slip.addEventListener('focusin',()=>{clearTimeout(noteTimer);slip.style.setProperty('--title-reveal','1')});
  addEventListener('scroll',requestPaint,{passive:true});
- addEventListener('resize',()=>{roomHeight=room.offsetHeight;roomWidth=room.offsetWidth;requestPaint()},{passive:true});
+ addEventListener('resize',()=>{roomHeight=room.offsetHeight;roomWidth=room.offsetWidth;doorAnchor=document.querySelector('.door-wrap').getBoundingClientRect();doorAnchor={...doorAnchor,top:doorAnchor.top+window.scrollY,left:doorAnchor.left,width:doorAnchor.width,height:doorAnchor.height};requestPaint()},{passive:true});
  document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);restPage();lensAnimation?.cancel();entrance.forEach(a=>a?.cancel())}
+  if(document.hidden){cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);clearTimeout(noteTimer);clearTimeout(insightTimer);lensMessage.classList.remove('is-visible');setNote(false);restPage();lensAnimation?.cancel();entrance.forEach(a=>a?.cancel())}
   else requestPaint();
  });
  motion.addEventListener('change',()=>{
