@@ -8,7 +8,7 @@
  const track=(event,params={})=>{if(typeof gtag==='function')gtag('event',event,{...params,send_to:'G-7MSJNH4L4Q'})};
  const meta=card=>({term_id:card.id,term_title:card.querySelector('h2').textContent.trim(),word_category:card.dataset.category});
  const indexed=cards.map(card=>({card,text:card.textContent.toLocaleLowerCase()}));
- let category='all',searchTimer;
+ let category='all',searchTimer,filterAnimation; 
  document.querySelector('.index-tools').hidden=false;
  function filter(){
   const words=query.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
@@ -19,6 +19,7 @@
   });
   buttons.forEach(button=>button.setAttribute('aria-pressed',String(category===button.dataset.filter)));
   count.textContent='共 '+shown+' 則';empty.hidden=shown>0;
+  filterAnimation?.cancel();filterAnimation=animate(document.querySelector('#archive'),[{opacity:.45},{opacity:1}],{duration:180});
   return shown;
  }
  function reset(){query.value='';category='all';filter()}
@@ -53,29 +54,51 @@
  openAnchor();
 
  const pick=document.querySelector('.home-recommendation'),pickLink=document.querySelector('#recommend-read');
- let recommended=null;
- function recommend(){
-  const pool=cards.filter(card=>card!==recommended);
-  recommended=pool[Math.floor(Math.random()*pool.length)]||cards[0];
-  const paras=[...recommended.querySelectorAll('details section:first-of-type p')];
+ let recommended=null,pendingPick=null,pickVersion=0,pickAnimations=[];
+ const pickContent=pick.querySelector('.recommend-content');
+ function choose(){const pool=cards.filter(card=>card!==(pendingPick||recommended));return pool[Math.floor(Math.random()*pool.length)]||cards[0]}
+ function renderPick(card){
+  recommended=card;
+  const paras=[...card.querySelectorAll('details section:first-of-type p')];
   const lead=paras.find(p=>p.textContent.trim().length>25)||paras[0];
-  document.querySelector('#recommend-number').textContent=recommended.querySelector('.term-number').textContent;
-  document.querySelector('#recommend-category').textContent=recommended.querySelector('.term-category').textContent;
-  document.querySelector('#recommend-title').textContent=recommended.querySelector('h2').textContent;
+  document.querySelector('#recommend-number').textContent=card.querySelector('.term-number').textContent;
+  document.querySelector('#recommend-category').textContent=card.querySelector('.term-category').textContent;
+  document.querySelector('#recommend-title').textContent=card.querySelector('h2').textContent;
   document.querySelector('#recommend-text').textContent=lead?.textContent||'打開筆記，一起認識這個詞。';
-  pickLink.setAttribute('href','#'+recommended.id);
+  pickLink.setAttribute('href','#'+card.id);
+  document.querySelector('#slip-title').textContent=card.querySelector('h2').textContent;
  }
- recommend();
+ async function recommend(withMotion=true){
+  const target=choose(),token=++pickVersion;pendingPick=target;
+  const from=pick.getBoundingClientRect().height;
+  pickAnimations.forEach(a=>a?.cancel());pickAnimations=[];pick.style.height='';
+  if(!withMotion||motion.matches){renderPick(target);pendingPick=null;return}
+  const out=animate(pickContent,[{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-12px)'}],{duration:160,fill:'forwards'});
+  pickAnimations.push(out);
+  await out?.finished.catch(()=>{});
+  if(token!==pickVersion)return;
+  renderPick(target);pendingPick=null;
+  const to=pick.getBoundingClientRect().height;
+  out?.cancel();
+  const height=animate(pick,[{height:from+'px'},{height:to+'px'}],{duration:260});
+  const arrival=animate(pickContent,[{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'translateY(0)'}],{duration:260});
+  pickAnimations=[height,arrival];
+  await Promise.all(pickAnimations.filter(Boolean).map(a=>a.finished.catch(()=>{})));
+  if(token===pickVersion){pickAnimations=[];pick.style.height=''}
+ }
+ recommend(false);
  document.querySelector('#recommend-another').hidden=false;
- document.querySelector('#recommend-another').addEventListener('click',()=>{
-  recommend();track('word_recommendation_change',meta(recommended));
-  animate(pick,[{opacity:.5,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:280});
+ document.querySelector('#recommend-another').addEventListener('click',()=>{recommend();track('word_recommendation_change',meta(pendingPick||recommended))});
+ document.querySelector('.nav-random').addEventListener('click',()=>{recommend();track('word_recommendation_change',meta(pendingPick||recommended))});
+ motion.addEventListener('change',()=>{
+  if(!motion.matches)return;
+  ++pickVersion;pickAnimations.forEach(a=>a?.cancel());pickAnimations=[];pick.style.height='';
+  if(pendingPick){renderPick(pendingPick);pendingPick=null}
  });
- document.querySelector('.nav-random').addEventListener('click',()=>{recommend();track('word_recommendation_change',meta(recommended))});
 
  const reader=document.querySelector('.reader'),copy=reader.querySelector('.reader-copy'),art=reader.querySelector('.reader-art');
  const prev=reader.querySelector('#reader-prev'),next=reader.querySelector('#reader-next'),close=reader.querySelector('#reader-close');
- let active=null,beat=0,turning=false,version=0,returnFocus=null,oldOverflow='',running=[];
+ let active=null,beat=0,turning=false,version=0,returnFocus=null,oldOverflow='',running=[],closing=false,dialogAnimation=null;
  const files=['reading-book-v2.png','reading-door-v2.png','reading-lens-v2.png'];
  function animate(el,frames,opts={}){
   if(motion.matches||!el?.animate)return null;
@@ -91,37 +114,43 @@
   copy.append(sections[beat].cloneNode(true));
   if(beat===2){
    const a=document.createElement('a');a.href='#'+active.id;a.className='source-return';a.textContent='回到筆記與資料來源 ↗';
-   a.addEventListener('click',()=>{exit();active.querySelector('details').open=true;requestAnimationFrame(()=>active.querySelector('details section:last-of-type').scrollIntoView({block:'center'}))});
+   a.addEventListener('click',async()=>{const card=active;await exit();card.querySelector('details').open=true;requestAnimationFrame(()=>card.querySelector('details section:last-of-type').scrollIntoView({block:'center'}))});
    copy.append(a);
   }
   art.replaceChildren();
   const img=document.createElement('img');img.src='./assets/'+files[beat];img.alt='';img.width=1024;img.height=1024;art.append(img);
   reader.querySelector('#reader-label').textContent=active.querySelector('.term-number').textContent+' / '+active.querySelector('.term-category').textContent;
   reader.querySelector('#reader-position').textContent=(beat+1)+' / 3';
-  reader.querySelector('.reader-progress span').style.width=((beat+1)/3*100)+'%';
+  reader.querySelector('.reader-progress span').style.transform='scaleX('+((beat+1)/3)+')';
   prev.disabled=beat===0;next.disabled=beat===2;
-  copy.querySelectorAll('h2,h3,p,.source-return').forEach((el,i)=>{
-   running.push(animate(el,[{opacity:0,transform:'translateY('+(direction*20)+'px)'},{opacity:1,transform:'none'}],{duration:430,delay:i*45,fill:'backwards'}));
-  });
-  running.push(animate(img,[{opacity:0,transform:'translateX('+(direction*75)+'px) rotate('+(direction*9)+'deg)'},{opacity:1,transform:'none'}],{duration:620}));
+  const shift=matchMedia('(max-width:700px)').matches?20:42;
+  running.push(animate(copy,[{opacity:0,transform:'translateX('+(direction*shift)+'px)'},{opacity:1,transform:'none'}],{duration:260}));
+  running.push(animate(img,[{opacity:0,transform:'translateX('+(direction*shift)+'px)'},{opacity:1,transform:'none'}],{duration:260}));
   reader.scrollTop=0;
  }
  function enter(card,trigger){
   if(typeof reader.showModal!=='function'){location.hash=card.id;return}
-  active=card;beat=0;turning=false;version++;returnFocus=trigger;oldOverflow=document.body.style.overflow;
+  active=card;beat=0;turning=false;closing=false;version++;returnFocus=trigger;oldOverflow=document.body.style.overflow;
   scene();reader.showModal();document.body.style.overflow='hidden';close.focus();
+  dialogAnimation?.cancel();dialogAnimation=animate(reader,[{opacity:0,translate:'0 15px'},{opacity:1,translate:'0 0'}],{duration:200});
   track('word_reader_open',meta(card));
  }
- function exit(){
-  version++;turning=false;stopScene();reader.close();document.body.style.overflow=oldOverflow;
+ async function exit(){
+  if(closing||!reader.open)return;
+  closing=true;const token=++version;turning=false;stopScene();dialogAnimation?.cancel();
+  dialogAnimation=animate(reader,[{opacity:1,translate:'0 0'},{opacity:0,translate:'0 10px'}],{duration:160});
+  await dialogAnimation?.finished.catch(()=>{});
+  if(token!==version)return;
+  reader.close();document.body.style.overflow=oldOverflow;closing=false;
   returnFocus?.focus({preventScroll:true});
  }
  async function turn(delta){
-  const target=beat+delta;if(!reader.open||turning||target<0||target>2)return;
+  const target=beat+delta;if(!reader.open||closing||turning||target<0||target>2)return;
   turning=true;const token=++version;
   try{
    const a=animate(copy,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX('+(-delta*35)+'px)'}],{duration:180});
-   const b=animate(art,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX('+(-delta*65)+'px) rotate('+(-delta*6)+'deg)'}],{duration:230});
+   const b=animate(art,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX('+(-delta*65)+'px) rotate('+(-delta*6)+'deg)'}],{duration:180});
+   running.push(a,b);
    await Promise.all([a,b].filter(Boolean).map(x=>x.finished.catch(()=>{})));
    if(!reader.open||token!==version)return;
    beat=target;scene(delta);copy.querySelector('h2').focus({preventScroll:true});
@@ -147,12 +176,12 @@
   if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5)turn(dx>0?1:-1);
  },{passive:true});
 
- // Finite entrance, under 1.2s; no hidden/inert controls and no scroll capture.
+ // Distinct title lines and objects arrive in under 1.2 seconds; controls stay live.
+ const entrance=[];
  if(!location.hash&&!motion.matches){
-  animate(document.querySelector('.poster-title'),[{opacity:0,translate:'0 28px'},{opacity:1,translate:'0 0'}],{duration:650});
-  [['.book',90,40],['.door',190,35],['.lens',300,50]].forEach(([selector,delay,offset])=>{
-   animate(document.querySelector('.room-props '+selector),[{opacity:0,translate:offset+'px 25px'},{opacity:1,translate:'0 0'}],{duration:700,delay,fill:'backwards'});
-  });
+  document.querySelectorAll('h1 > span').forEach((line,i)=>entrance.push(animate(line,[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:480,delay:i*100,fill:'backwards'})));
+  entrance.push(animate(document.querySelector('.question'),[{opacity:0,transform:'rotate(-14deg) translateY(10px)'},{opacity:1,transform:'rotate(0deg) translateY(0)'}],{duration:400,delay:260,fill:'backwards'}));
+  [['.book',180],['.door',300],['.lens',420]].forEach(([selector,delay])=>entrance.push(animate(document.querySelector('.room-props '+selector),[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:600,delay,fill:'backwards'})));
  }
  // One finite paper turn: curled outer edge, moving crease, soft landing.
  const bookSurface=document.querySelector('.book-surface');
@@ -177,34 +206,58 @@
  if(!location.hash&&!motion.matches)pageTimer=setTimeout(flipPage,1100);
  motion.addEventListener('change',()=>{if(motion.matches){clearTimeout(pageTimer);restPage()}});
 
- // Keep frame and threshold still while the actual leaf opens about its hinge.
- const leaf=document.querySelector('.door-leaf'),lens=document.querySelector('.room-props .lens');
- let doorAnimation=null,lensAnimation=null;
- function openDoor(){
-  if(motion.matches||doorAnimation?.playState==='running')return;
-  doorAnimation=animate(leaf,[{transform:'scaleX(-2.15) skewY(-5deg)'},{transform:'scaleX(-.55) skewY(3deg)',offset:.5},{transform:'scaleX(1) skewY(0deg)'}],{duration:1600});
- }
+ // Scroll narrative: fixed frame + independent clipped leaf, a note and doorway light.
+ const room=document.querySelector('.room'),leaf=document.querySelector('.door-leaf'),lens=document.querySelector('.room-props .lens');
+ const slip=document.querySelector('.word-slip'),glow=document.querySelector('.door-glow');
+ const layers=[...document.querySelectorAll('[data-parallax]')];
+ const small=matchMedia('(max-width:700px)'),fine=matchMedia('(hover:hover) and (pointer:fine)');
+ let lensAnimation=null,roomHeight=room.offsetHeight,roomWidth=room.offsetWidth,raf=0,mx=0,my=0,inside=false,visible=true;
  function magnify(){
   if(motion.matches||lensAnimation?.playState==='running')return;
-  lensAnimation=animate(lens,[{transform:'rotate(-18deg) scale(1)'},{transform:'rotate(-9deg) scale(1.16)',offset:.45},{transform:'rotate(-9deg) scale(1.16)',offset:.65},{transform:'rotate(-18deg) scale(1)'}],{duration:1600});
+  lensAnimation=animate(lens,[{transform:'rotate(-18deg) scale(1)'},{transform:'rotate(-9deg) scale(1.13)',offset:.5},{transform:'rotate(-18deg) scale(1)'}],{duration:1100});
  }
- document.querySelector('.door-wrap')?.addEventListener('pointerenter',openDoor);
- document.querySelector('.lens-wrap')?.addEventListener('pointerenter',magnify);
- const propTimers=[];
- if(!location.hash&&!motion.matches){propTimers.push(setTimeout(openDoor,2600),setTimeout(magnify,4300))}
- motion.addEventListener('change',()=>{if(motion.matches){propTimers.forEach(clearTimeout);doorAnimation?.cancel();lensAnimation?.cancel()}});
- // Passive scroll listener; only transform writes happen on animation frames.
- const room=document.querySelector('.room'),layers=[...document.querySelectorAll('[data-parallax]')];
- let roomHeight=room.offsetHeight,raf=0;
- const small=matchMedia('(max-width:700px)');
+ document.querySelector('.lens-wrap')?.addEventListener('pointerenter',()=>{if(fine.matches)magnify()});
+ const lensTimer=!location.hash&&!motion.matches?setTimeout(magnify,1700):0;
+ const clamp=n=>Math.max(0,Math.min(1,n));
  function paint(){
-  raf=0;
-  const y=Math.max(0,Math.min(window.scrollY,roomHeight));
-  layers.forEach(el=>el.style.transform=motion.matches?'':('translate3d(0,'+(-y*Number(el.dataset.parallax)*(small.matches ? 0.28 : 1))+'px,0)'));
+  raf=0;if(document.hidden||!visible)return;
+  const y=Math.max(0,window.scrollY),mobile=small.matches;
+  const progress=clamp((y-roomHeight*(mobile ? 0.1 : 0.12))/Math.min(520,roomHeight*.62));
+  const eased=progress*progress*(3-2*progress),amount=motion.matches?0:eased;
+  layers.forEach(el=>{
+   const amplitude=el.classList.contains('lens-wrap')?16:el.classList.contains('door-wrap')?8:el.classList.contains('book-wrap')?4:0;
+   const px=motion.matches||!fine.matches?0:mx*amplitude;
+   const py=motion.matches||!fine.matches?0:my*amplitude;
+   el.style.transform=motion.matches?'':`translate3d(${px}px,${-Math.min(y,roomHeight)*Number(el.dataset.parallax)*(mobile ? 0.2 : 1)+py}px,0)`;
+  });
+  // Opening is driven only by bounded scroll progress, so scrolling up reverses it.
+  leaf.style.transform=motion.matches?'':`scaleX(${-2.15+3.15*eased}) skewY(${-5*(1-eased)}deg)`;
+  glow.style.opacity=motion.matches?'0':String(.6*eased);
+  const release=clamp((amount-.18)/.7);
+  slip.style.opacity=motion.matches?'0':String(clamp(release*3)*(1-clamp((progress-.88)/.12)));
+  slip.style.transform=`translate3d(${-28*release}px,${(mobile?75:160)*release}px,0) rotate(${-12*release}deg) scale(${.65+.35*release})`;
  }
- function requestPaint(){if(!raf)raf=requestAnimationFrame(paint)}
+ function requestPaint(){if(!raf&&!document.hidden&&visible)raf=requestAnimationFrame(paint)}
+ room.addEventListener('pointermove',event=>{
+  if(!fine.matches||motion.matches||!inside||!visible||document.hidden)return;
+  mx=(event.clientX/roomWidth-.5)*2;my=((event.clientY+scrollY)/roomHeight-.5)*2;requestPaint();
+ },{passive:true});
+ room.addEventListener('pointerenter',()=>{inside=true});
+ room.addEventListener('pointerleave',()=>{inside=false;mx=0;my=0;requestPaint()});
+ const observer=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{
+  visible=entries[0].isIntersecting;
+  if(visible)requestPaint();else{cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);restPage();lensAnimation?.cancel()}
+ }):null;
+ observer?.observe(room);
  addEventListener('scroll',requestPaint,{passive:true});
- addEventListener('resize',()=>{roomHeight=room.offsetHeight;requestPaint()},{passive:true});
- motion.addEventListener('change',()=>{if(motion.matches)stopScene();requestPaint()});
+ addEventListener('resize',()=>{roomHeight=room.offsetHeight;roomWidth=room.offsetWidth;requestPaint()},{passive:true});
+ document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);restPage();lensAnimation?.cancel();entrance.forEach(a=>a?.cancel())}
+  else requestPaint();
+ });
+ motion.addEventListener('change',()=>{
+  if(motion.matches){stopScene();restPage();filterAnimation?.cancel();dialogAnimation?.cancel();entrance.forEach(a=>a?.cancel());clearTimeout(lensTimer);lensAnimation?.cancel()}
+  requestPaint();
+ });
  requestPaint();
 })();
