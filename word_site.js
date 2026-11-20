@@ -64,7 +64,7 @@
   document.querySelector('#recommend-number').textContent=card.querySelector('.term-number').textContent;
   document.querySelector('#recommend-category').textContent=card.querySelector('.term-category').textContent;
   document.querySelector('#recommend-title').textContent=card.querySelector('h2').textContent;
-  document.querySelector('#recommend-text').textContent=lead?.textContent||'打開筆記，一起認識這個詞。';
+  document.querySelector('#recommend-text').textContent=(lead?.textContent||'打開筆記，一起認識這個詞。').replace(/^\s*[123]\s*[/／]\s*3(?:\s*[|｜:：、.)）-]\s*|\s+)/u,'');
   pickLink.setAttribute('href','#'+card.id);
   document.querySelector('#slip-read').setAttribute('href','#'+card.id);
   document.querySelector('#slip-title').textContent=card.querySelector('h2').textContent;
@@ -143,8 +143,10 @@
   await dialogAnimation?.finished.catch(()=>{});
   if(token!==version)return;
   reader.close();document.body.style.overflow=oldOverflow;closing=false;
-  if(returnFocus?.id==='slip-read'){clearTimeout(noteTimer);setNote(true);slip.style.setProperty('--title-reveal','1');slip.style.setProperty('--slip-enter','1')}
-  returnFocus?.focus({preventScroll:true});
+  if(returnFocus?.id==='slip-read'){
+   if(canShowNote()){setNote(true);slip.style.setProperty('--title-reveal','1');slip.style.setProperty('--slip-enter','1');returnFocus.focus({preventScroll:true})}
+   else pickLink.focus({preventScroll:true});
+  }else returnFocus?.focus({preventScroll:true});
  }
  async function turn(delta){
   const target=beat+delta;if(!reader.open||closing||turning||target<0||target>2)return;
@@ -213,7 +215,17 @@
  const room=document.querySelector('.room'),leaf=document.querySelector('.door-leaf'),lens=document.querySelector('.room-props .lens');
  const slip=document.querySelector('.word-slip'),glow=document.querySelector('.door-glow'),question=document.querySelector('.question'),lensMessage=document.querySelector('.lens-message');
  let noteSeenAt=0,noteDismissed=false,noteTimer=0,noteActive=false,insightTimer=0,noteRevealTimer=0;
- const setNote=show=>{noteActive=show;slip.classList.toggle('is-readable',show);slip.inert=!show;slip.setAttribute('aria-hidden',String(!show))};
+ let recommendationVisible=false,inlineNote=false;
+ function recommendationInView(){const r=pick.getBoundingClientRect();return r.bottom>0&&r.top<(window.innerHeight||860)}
+ function canShowNote(){return !recommendationVisible&&pick.getBoundingClientRect().top>=(window.innerHeight||860)&&!noteDismissed&&!reader.open}
+ function placeNote(){
+  inlineNote=matchMedia('(max-width:700px)').matches&&((window.innerWidth||390)<400||(window.innerHeight||844)<820);
+  slip.classList.toggle('is-inline',inlineNote);
+  const parent=inlineNote?document.querySelector('.slip-inline-slot'):document.body;
+  if(slip.parentElement!==parent)parent.append(slip);
+ }
+ placeNote();
+ const setNote=show=>{show=show&&canShowNote();noteActive=show;slip.classList.toggle('is-readable',show);slip.inert=!show;slip.setAttribute('aria-hidden',String(!show))};
  setNote(false);
  document.querySelector('.slip-dismiss').addEventListener('click',()=>{noteDismissed=true;setNote(false);document.querySelector('.nav-random').focus({preventScroll:true})});
  function insight(){
@@ -257,10 +269,10 @@
   const now=Date.now();
   const reached=release>0;
   if(y<start*.6){noteSeenAt=0;noteDismissed=false;clearTimeout(noteTimer);clearTimeout(noteRevealTimer);setNote(false)}
-  else if(reached&&!noteDismissed&&!reader.open){
+  else if(reached&&canShowNote()){
    if(!noteSeenAt){noteSeenAt=now;noteRevealTimer=setTimeout(()=>{if(noteActive){slip.style.setProperty('--title-reveal','1');slip.style.setProperty('--slip-enter','1');slip.style.setProperty('--slip-x','0px');slip.style.setProperty('--slip-y','0px')}},450)}
-   // A brief reading hold survives a fast fling without trapping normal scrolling.
-   const inStory=y<roomHeight+100,holding=now-noteSeenAt<2200;
+   // The primary recommendation always wins over any minimum reading hold.
+   const inStory=y<roomHeight,holding=!mobile&&now-noteSeenAt<2200;
    setNote(inStory||holding);
    const reveal=motion.matches?1:Math.max(clamp(release*1.8),clamp((now-noteSeenAt)/450));
    slip.style.setProperty('--slip-enter',String(reveal));
@@ -268,8 +280,8 @@
    slip.style.setProperty('--slip-y',((1-reveal)*(doorAnchor.top+doorAnchor.height*.55-y-((window.innerHeight||860)-(mobile?16:28)-90)))+'px');
    slip.style.setProperty('--title-reveal',String(motion.matches?1:Math.max(clamp((release-.42)/.4),clamp((now-noteSeenAt-160)/290))));
    clearTimeout(noteTimer);
-   if(holding)noteTimer=setTimeout(()=>{if(window.scrollY>=roomHeight+100&&!slip.contains(document.activeElement))setNote(false)},2250-(now-noteSeenAt));
-  }else if(reader.open)setNote(false);
+   if(holding&&noteActive)noteTimer=setTimeout(()=>{if(window.scrollY>=roomHeight+100&&!slip.contains(document.activeElement))setNote(false)},2250-(now-noteSeenAt));
+  }else setNote(false);
 
  }
  function requestPaint(){if(!raf&&!document.hidden)raf=requestAnimationFrame(paint)}
@@ -284,9 +296,14 @@
   if(visible)requestPaint();else{cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);restPage();lensAnimation?.cancel()}
  }):null;
  observer?.observe(room);
+ const recommendationObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{
+  recommendationVisible=entries[0].isIntersecting;
+  if(recommendationVisible){clearTimeout(noteTimer);clearTimeout(noteRevealTimer);setNote(false)}else requestPaint();
+ },{threshold:0}):null;
+ recommendationObserver?.observe(pick);
  slip.addEventListener('focusin',()=>{clearTimeout(noteTimer);slip.style.setProperty('--title-reveal','1')});
  addEventListener('scroll',requestPaint,{passive:true});
- addEventListener('resize',()=>{roomHeight=room.offsetHeight;roomWidth=room.offsetWidth;doorAnchor=document.querySelector('.door-wrap').getBoundingClientRect();doorAnchor={...doorAnchor,top:doorAnchor.top+window.scrollY,left:doorAnchor.left,width:doorAnchor.width,height:doorAnchor.height};requestPaint()},{passive:true});
+ addEventListener('resize',()=>{placeNote();roomHeight=room.offsetHeight;roomWidth=room.offsetWidth;doorAnchor=document.querySelector('.door-wrap').getBoundingClientRect();doorAnchor={...doorAnchor,top:doorAnchor.top+window.scrollY,left:doorAnchor.left,width:doorAnchor.width,height:doorAnchor.height};requestPaint()},{passive:true});
  document.addEventListener('visibilitychange',()=>{
   if(document.hidden){cancelAnimationFrame(raf);raf=0;mx=my=0;clearTimeout(pageTimer);clearTimeout(lensTimer);clearTimeout(noteTimer);clearTimeout(insightTimer);lensMessage.classList.remove('is-visible');setNote(false);restPage();lensAnimation?.cancel();entrance.forEach(a=>a?.cancel())}
   else requestPaint();

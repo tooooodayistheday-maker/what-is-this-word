@@ -130,3 +130,11 @@ footer{padding:65px 6%;background:var(--cobalt);color:var(--cream);display:flex;
 .word-slip a:focus-visible,.slip-dismiss:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 @media(max-width:700px){.word-slip{right:16px;bottom:16px;width:228px}.word-slip a{padding:22px;min-height:145px}.word-slip strong{font-size:25px;margin:12px 0}.word-slip span{font-size:11px}.word-slip .slip-cta{font-size:13px}.lens-message{font-size:14px}.slip-dismiss{width:44px;height:44px;right:0;top:0}}
 @media(prefers-reduced-motion:reduce){.word-slip{display:block;transform:none!important;transition:none}.word-slip strong{opacity:1;transform:none}.lens-message{transition:none}.lens-message.is-visible{transform:rotate(-18deg)}}
+
+/* Small screens use an in-flow note when there is no safe floating space. */
+.slip-inline-slot{position:relative;z-index:6;margin:0 22px}
+.word-slip.is-inline{position:relative;inset:auto;width:100%;max-width:360px;margin:18px auto 24px;display:block;transform:none!important;box-shadow:5px 5px 0 var(--cobalt);transition:opacity .18s}
+.word-slip.is-inline.is-readable{display:block}
+@media(max-width:700px){.floor-label{display:none}.word-slip{transition:opacity .12s,visibility .12s}.word-slip:not(.is-readable){transition:none;visibility:hidden}}
+
+.word-slip:not(.is-readable){transition:none;visibility:hidden;pointer-events:none}
