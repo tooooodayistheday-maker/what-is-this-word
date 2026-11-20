@@ -154,6 +154,45 @@
    animate(document.querySelector('.room-props '+selector),[{opacity:0,translate:offset+'px 25px'},{opacity:1,translate:'0 0'}],{duration:700,delay,fill:'backwards'});
   });
  }
+ // One finite paper turn: curled outer edge, moving crease, soft landing.
+ const bookSurface=document.querySelector('.book-surface');
+ const paper=bookSurface?.querySelector('.turning-page');
+ let pageTimer=0,pageBusy=false,pageAnimations=[];
+ function restPage(){pageAnimations.forEach(a=>a?.cancel());pageAnimations=[];pageBusy=false}
+ function flipPage(){
+  if(!paper||motion.matches||pageBusy)return;
+  pageBusy=true;
+  const frames=[0,.2,.5,.8,1].map(u=>{
+   const x=1430-1220*u,lift=Math.sin(Math.PI*u),top=140-135*lift;
+   const d=`M750 285 C${930-250*u} ${140-125*lift} ${x-110} ${top+50} ${x-195} ${top} C${x-135} ${330-150*lift} ${x+45} ${420-190*lift} ${x} ${415-155*lift} C${x-45} ${610-80*lift} ${1060-650*u} ${460-120*lift} 808 750 C790 580 775 400 750 285 Z`;
+   return {d:'path("'+d+'")',offset:u};
+  });
+  pageAnimations=[...paper.querySelectorAll('path')].map(path=>animate(path,frames,{duration:1850}));
+  const visibility=animate(paper,[{opacity:0},{opacity:1,offset:.1},{opacity:1,offset:.88},{opacity:0}],{duration:1850});
+  pageAnimations.push(visibility);
+  visibility?.finished.then(()=>{pageBusy=false;pageAnimations=[]}).catch(()=>{});
+ }
+ bookSurface?.addEventListener('pointerenter',flipPage);
+ // Mobile gets the same finite entrance turn, without requiring hover.
+ if(!location.hash&&!motion.matches)pageTimer=setTimeout(flipPage,1100);
+ motion.addEventListener('change',()=>{if(motion.matches){clearTimeout(pageTimer);restPage()}});
+
+ // Keep frame and threshold still while the actual leaf opens about its hinge.
+ const leaf=document.querySelector('.door-leaf'),lens=document.querySelector('.room-props .lens');
+ let doorAnimation=null,lensAnimation=null;
+ function openDoor(){
+  if(motion.matches||doorAnimation?.playState==='running')return;
+  doorAnimation=animate(leaf,[{transform:'scaleX(-2.15) skewY(-5deg)'},{transform:'scaleX(-.55) skewY(3deg)',offset:.5},{transform:'scaleX(1) skewY(0deg)'}],{duration:1600});
+ }
+ function magnify(){
+  if(motion.matches||lensAnimation?.playState==='running')return;
+  lensAnimation=animate(lens,[{transform:'rotate(-18deg) scale(1)'},{transform:'rotate(-9deg) scale(1.16)',offset:.45},{transform:'rotate(-9deg) scale(1.16)',offset:.65},{transform:'rotate(-18deg) scale(1)'}],{duration:1600});
+ }
+ document.querySelector('.door-wrap')?.addEventListener('pointerenter',openDoor);
+ document.querySelector('.lens-wrap')?.addEventListener('pointerenter',magnify);
+ const propTimers=[];
+ if(!location.hash&&!motion.matches){propTimers.push(setTimeout(openDoor,2600),setTimeout(magnify,4300))}
+ motion.addEventListener('change',()=>{if(motion.matches){propTimers.forEach(clearTimeout);doorAnimation?.cancel();lensAnimation?.cancel()}});
  // Passive scroll listener; only transform writes happen on animation frames.
  const room=document.querySelector('.room'),layers=[...document.querySelectorAll('[data-parallax]')];
  let roomHeight=room.offsetHeight,raf=0;
