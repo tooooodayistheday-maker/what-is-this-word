@@ -59,12 +59,10 @@
  function choose(){const pool=cards.filter(card=>card!==(pendingPick||recommended));return pool[Math.floor(Math.random()*pool.length)]||cards[0]}
  function renderPick(card){
   recommended=card;
-  const paras=[...card.querySelectorAll('details section:first-of-type p')];
-  const lead=paras.find(p=>p.textContent.trim().length>25)||paras[0];
   document.querySelector('#recommend-number').textContent=card.querySelector('.term-number').textContent;
   document.querySelector('#recommend-category').textContent=card.querySelector('.term-category').textContent;
   document.querySelector('#recommend-title').textContent=card.querySelector('h2').textContent;
-  document.querySelector('#recommend-text').textContent=(lead?.textContent||'打開筆記，一起認識這個詞。').replace(/^\s*[123]\s*[/／]\s*3(?:\s*[|｜:：、.)）-]\s*|\s+)/u,'');
+  document.querySelector('#recommend-text').textContent=card.dataset.recommendationSummary;
   pickLink.setAttribute('href','#'+card.id);
   document.querySelector('#slip-read').setAttribute('href','#'+card.id);
   document.querySelector('#slip-title').textContent=card.querySelector('h2').textContent;
