@@ -1,0 +1,55 @@
+{
+  "data": [
+    {
+      "id": "urban",
+      "title": "城市與空間",
+      "count": 3,
+      "published_date": "2026-11-01",
+      "updated_at": "2026-11-23T17:18:54+08:00"
+    },
+    {
+      "id": "psychology",
+      "title": "心理與思考",
+      "count": 10,
+      "published_date": "2026-10-29",
+      "updated_at": "2026-11-23T17:18:54+08:00"
+    },
+    {
+      "id": "integration-test",
+      "title": "整合測試",
+      "count": 1,
+      "published_date": "2026-11-23",
+      "updated_at": "2026-11-23T17:18:54+08:00"
+    },
+    {
+      "id": "digital",
+      "title": "數位生活",
+      "count": 2,
+      "published_date": "2026-11-10",
+      "updated_at": "2026-11-23T17:18:54+08:00"
+    },
+    {
+      "id": "everyday",
+      "title": "日常經濟",
+      "count": 3,
+      "published_date": "2026-11-07",
+      "updated_at": "2026-11-23T17:18:54+08:00"
+    },
+    {
+      "id": "society",
+      "title": "社會與日常",
+      "count": 3,
+      "published_date": "2026-11-04",
+      "updated_at": "2026-11-23T17:18:54+08:00"
+    },
+    {
+      "id": "design",
+      "title": "設計與無障礙",
+      "count": 3,
+      "published_date": "2026-11-05",
+      "updated_at": "2026-11-23T17:18:54+08:00"
+    }
+  ],
+  "next_cursor": null,
+  "total": 7
+}

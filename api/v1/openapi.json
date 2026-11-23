@@ -1,0 +1,860 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "WorksHub+ 這個詞，是什麼？ API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://workshub-word-notes-api.tooooodayistheday.chatgpt.site"
+    }
+  ],
+  "paths": {
+    "/api/v1/words": {
+      "get": {
+        "summary": "清單",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "next_cursor",
+                    "total"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Record"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": "integration-utf8",
+                      "title": "整合欄位測試：中文與 emoji 🦫📚",
+                      "category": "整合測試",
+                      "url": "https://tooooodayistheday-maker.github.io/what-is-this-word/api-test.html",
+                      "published_date": "2026-11-23",
+                      "primary_source_url": "",
+                      "source_count": 0,
+                      "is_test": true,
+                      "life_context": "當 Bot 收到中文與 emoji 🦫📚，文字是否仍然完整？",
+                      "summary": "這是一筆明確標示的整合測試資料，用來檢查中文、emoji 🦫📚、空值、數字與長文字的欄位對應。",
+                      "act1": "中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。",
+                      "act2": "中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。\n\n中文欄位測試：河狸 🦫、書本 📚、放大鏡 🔎。引號「你好」、半形引號 \"hello\"、換行與標點都應完整保留。這段文字只用於 WorksHub+ 整合測試，不是研究文章或正式冷知識。",
+                      "act3": "測試結束後，可停用這筆 API 測試資料；它不會進入隨機推薦與最新文章。",
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    },
+                    {
+                      "id": "023",
+                      "title": "公地悲劇",
+                      "category": "日常經濟",
+                      "life_context": "公用冰箱的食材大家都能拿，為什麼最後沒有人補貨？",
+                      "summary": "辦公室茶水間的公用零食，為什麼常常一下就被拿光，最後卻沒有人願意主動補充？這背後其實隱含著共享資源面臨耗竭的經典困境。",
+                      "act1": "公地悲劇描述一群人共同使用某種共享資源時，因為缺乏節制與維護，最終導致資源耗盡或崩潰的現象。\n\n這項概念是賽局理論中的基礎核心問題，常被學者用於研究生態演化動力學，探討背叛者與合作者在共享資源下的互動困境。",
+                      "act2": "自編示意：在合租公寓裡，大家都能自由取用客廳公用冰箱的雞蛋與牛奶，卻往往沒有房客主動掏錢補貨或清理過期食品。\n\n關鍵細節在於每個人享受使用資源的全部好處，卻把維護成本留給所有人分擔，最終導致公用食材見底且冰箱無人維護。",
+                      "act3": "公地悲劇並非單純指涉個人道德敗壞或自私，而是共享資源缺乏有效規範與誘因機制時，集體面臨的結構性困境。\n\n日常觀察時，可以思考團體中是否存在合適的激勵制度與互惠機制，能促使大家主動維護共享設施而非坐享其成。",
+                      "primary_source_url": "https://pubmed.ncbi.nlm.nih.gov/42776033/",
+                      "source_count": 3,
+                      "url": "https://tooooodayistheday-maker.github.io/what-is-this-word/#term-023",
+                      "published_date": "2026-11-22",
+                      "is_test": false,
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    }
+                  ],
+                  "next_cursor": "<請使用實際回應的游標>",
+                  "total": 25
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "參數或游標錯誤",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "驗證失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "僅支援 GET",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "上游資料暫時無法讀取",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API 尚未完成設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "updated_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/words/{id}": {
+      "get": {
+        "summary": "單筆",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Record"
+                },
+                "example": {
+                  "id": "017",
+                  "title": "十五分鐘城市",
+                  "category": "城市與空間",
+                  "life_context": "如果買菜、上學和散步，都能從家裡走路到達，一天會有什麼不同？",
+                  "summary": "如果買菜、看診、散步和接孩子，都能在住家附近完成，一天會有什麼不同？走得到不一定代表人人都好走，從一趟日常出門，想想你理想中的生活圈。",
+                  "act1": "十五分鐘城市是指居民透過步行或騎自行車，在十五分鐘內就能抵達並滿足日常基本生活需求的都市規劃概念。\n\n此概念在研究與規劃中備受關注，核心在於透過密度、多樣性與設計三項要素，達成多功能鄰里的就近可及性。\n\n詞彙網站首頁：https://tooooodayistheday-maker.github.io/what-is-this-word/",
+                  "act2": "自編示意：小林住在複合生活圈，早上下樓散步就能採買生鮮並送小孩上學，傍晚還能步行到口袋公園散步休憩。\n\n這個情境的核心細節在於各類日常機能與休閒綠地皆在短程徒步範圍內，不必依賴開車即可滿足每日活動。",
+                  "act3": "容易混淆的是它不只是市中心步行便利，若忽略外圍市郊的高汽車依賴，或欠缺自然綠地與生物多樣性，便不算完整實踐。\n\n日常可觀察周遭除了商家外，是否擁有具生態價值的口袋公園或社區花園，並思考不同社群是否享有平等的綠意空間。",
+                  "primary_source_url": "https://pubmed.ncbi.nlm.nih.gov/42338527/",
+                  "source_count": 3,
+                  "url": "https://tooooodayistheday-maker.github.io/what-is-this-word/#term-017",
+                  "published_date": "2026-11-16",
+                  "is_test": false,
+                  "updated_at": "2026-11-23T17:18:54+08:00"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "參數或游標錯誤",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "驗證失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "僅支援 GET",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "上游資料暫時無法讀取",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API 尚未完成設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "017"
+          }
+        ]
+      }
+    },
+    "/api/v1/words/latest": {
+      "get": {
+        "summary": "最新一篇",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Record"
+                },
+                "example": {
+                  "id": "023",
+                  "title": "公地悲劇",
+                  "category": "日常經濟",
+                  "life_context": "公用冰箱的食材大家都能拿，為什麼最後沒有人補貨？",
+                  "summary": "辦公室茶水間的公用零食，為什麼常常一下就被拿光，最後卻沒有人願意主動補充？這背後其實隱含著共享資源面臨耗竭的經典困境。",
+                  "act1": "公地悲劇描述一群人共同使用某種共享資源時，因為缺乏節制與維護，最終導致資源耗盡或崩潰的現象。\n\n這項概念是賽局理論中的基礎核心問題，常被學者用於研究生態演化動力學，探討背叛者與合作者在共享資源下的互動困境。",
+                  "act2": "自編示意：在合租公寓裡，大家都能自由取用客廳公用冰箱的雞蛋與牛奶，卻往往沒有房客主動掏錢補貨或清理過期食品。\n\n關鍵細節在於每個人享受使用資源的全部好處，卻把維護成本留給所有人分擔，最終導致公用食材見底且冰箱無人維護。",
+                  "act3": "公地悲劇並非單純指涉個人道德敗壞或自私，而是共享資源缺乏有效規範與誘因機制時，集體面臨的結構性困境。\n\n日常觀察時，可以思考團體中是否存在合適的激勵制度與互惠機制，能促使大家主動維護共享設施而非坐享其成。",
+                  "primary_source_url": "https://pubmed.ncbi.nlm.nih.gov/42776033/",
+                  "source_count": 3,
+                  "url": "https://tooooodayistheday-maker.github.io/what-is-this-word/#term-023",
+                  "published_date": "2026-11-22",
+                  "is_test": false,
+                  "updated_at": "2026-11-23T17:18:54+08:00"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "參數或游標錯誤",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "驗證失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "僅支援 GET",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "上游資料暫時無法讀取",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API 尚未完成設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/words/random": {
+      "get": {
+        "summary": "隨機一篇",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Record"
+                },
+                "example": {
+                  "id": "003",
+                  "title": "敵意建築",
+                  "category": "城市與空間",
+                  "life_context": "為什麼有些長椅，中間偏偏多了一根扶手？",
+                  "summary": "一張椅子讓人能坐下，卻很難久留；某些空間看似開放，使用起來卻處處受限。這些安排在照顧誰，又可能讓誰離開？從街角設施，練習分辨設計與使用的關係。",
+                  "act1": "走累了想找地方坐，卻發現座椅很難久坐；有些平台還裝了尖刺，讓人無法停留。這些設計，有時會被稱為「敵意建築」（hostile architecture）。\n\n它指透過空間或設施，限制某些活動、排除某些使用者的設計策略，也常被稱為防禦性建築或排他性設計。這是城市設計與公共空間的討論概念，不是心理診斷。\n\n問題不只在外觀好不好看，而是：誰能舒服地使用這個地方？誰被擋在外面？",
+                  "act2": "常被討論的例子，包括防止躺臥的座椅，以及阻止人停留的平台尖刺。這些安排可能限制無家者休息，也可能影響其他需要歇腳的人。\n\n自編示意：有人帶長輩散步，沿途的座椅卻很難安穩坐下，原本短短一段路，變得難以完成。\n\n不過，不能只看到扶手、隔板或欄杆，就認定是敵意建築。扶手也可能幫助長者起身，欄杆可能為了安全；用途、位置與實際影響都要一起看。",
+                  "act3": "下次經過廣場、車站或公園，可以試著問三個問題：\n\n① 這個設計方便了誰，又讓誰更難使用？\n② 它處理的是安全需求，還是把某些人趕到別處？\n③ 有沒有兼顧安全、無障礙與休息需求的做法？\n\n討論時也可以這樣說：「我想了解這項設計的用途，以及是否有更包容的替代方案。」\n\n不是替每個設施貼標籤，而是多看見公共空間裡，不同人的使用需要。",
+                  "primary_source_url": "https://www.unsw.edu.au/newsroom/news/2020/08/defensive-architecture-design-its-most-hostile",
+                  "source_count": 2,
+                  "url": "https://tooooodayistheday-maker.github.io/what-is-this-word/#term-003",
+                  "published_date": "2026-11-01",
+                  "is_test": false,
+                  "updated_at": "2026-11-23T17:18:54+08:00"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "參數或游標錯誤",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "驗證失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "僅支援 GET",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "上游資料暫時無法讀取",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API 尚未完成設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/categories": {
+      "get": {
+        "summary": "分類",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "next_cursor",
+                    "total"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "count": {
+                            "type": "integer"
+                          },
+                          "published_date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    },
+                    "next_cursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": "urban",
+                      "title": "城市與空間",
+                      "count": 3,
+                      "published_date": "2026-11-01",
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    },
+                    {
+                      "id": "psychology",
+                      "title": "心理與思考",
+                      "count": 10,
+                      "published_date": "2026-10-29",
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    },
+                    {
+                      "id": "integration-test",
+                      "title": "整合測試",
+                      "count": 1,
+                      "published_date": "2026-11-23",
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    },
+                    {
+                      "id": "digital",
+                      "title": "數位生活",
+                      "count": 2,
+                      "published_date": "2026-11-10",
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    },
+                    {
+                      "id": "everyday",
+                      "title": "日常經濟",
+                      "count": 3,
+                      "published_date": "2026-11-07",
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    },
+                    {
+                      "id": "society",
+                      "title": "社會與日常",
+                      "count": 3,
+                      "published_date": "2026-11-04",
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    },
+                    {
+                      "id": "design",
+                      "title": "設計與無障礙",
+                      "count": 3,
+                      "published_date": "2026-11-05",
+                      "updated_at": "2026-11-23T17:18:54+08:00"
+                    }
+                  ],
+                  "next_cursor": null,
+                  "total": 7
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "參數或游標錯誤",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "驗證失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "找不到資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "僅支援 GET",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "上游資料暫時無法讀取",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "API 尚未完成設定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "updated_after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      },
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "Record": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "category",
+          "life_context",
+          "summary",
+          "act1",
+          "act2",
+          "act3",
+          "primary_source_url",
+          "source_count",
+          "url",
+          "published_date",
+          "is_test",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "life_context": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "act1": {
+            "type": "string"
+          },
+          "act2": {
+            "type": "string"
+          },
+          "act3": {
+            "type": "string"
+          },
+          "primary_source_url": {
+            "type": "string"
+          },
+          "source_count": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string"
+          },
+          "published_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "is_test": {
+            "type": "boolean"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
