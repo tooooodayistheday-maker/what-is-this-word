@@ -33,27 +33,25 @@
    }
   }
  }
- if(typeof module!=='undefined'&&module.exports)module.exports={TagWorld,paperProgress};
+ if(typeof module!=='undefined'&&module.exports)module.exports={TagWorld,paperProgress,isTap};
  if(typeof document==='undefined')return;
  const root=document.querySelector('#word-motion-lab');if(!root)return;
- const paper=root.querySelector('#paper-canvas'),tags=root.querySelector('#tag-canvas');
+ const paper=document.querySelector('#paper-canvas'),tags=root.querySelector('#tag-canvas');
  const pc=paper.getContext('2d'),tc=tags.getContext('2d');if(!pc||!tc)return;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)'),css=getComputedStyle(document.documentElement);
  const colors=Object.fromEntries(['brand','paper','accent','section','ink','muted'].map(k=>[k,css.getPropertyValue('--color-'+k).trim()]));
- const cards=[...document.querySelectorAll('#archive>article')],terms=cards.map(c=>({title:c.querySelector('h2').textContent.trim(),id:c.id,category:c.dataset.category}));
+ const terms=window.WordNotes.terms;
  const font='"Noto Sans TC","Microsoft JhengHei",sans-serif';
  const texture=document.createElement('canvas');texture.width=640;texture.height=820;const tx=texture.getContext('2d');
  let W=0,H=0,TW=0,TH=0,dpr=1,world,frame=0,previous=0,paperTime=0,accumulator=0,idleTime=0,visible=false,paused=reduced.matches,readerOpen=false,currentTitle='',phase='',samples=[],fpsStart=0,fpsFrames=0,paperFlat=false;
  const pauseButton=root.querySelector('#lab-pause'),replay=root.querySelector('#paper-replay'),tagReset=root.querySelector('#tag-reset'),form=root.querySelector('#tag-form'),input=root.querySelector('#tag-text'),status=root.querySelector('#tag-status'),target=root.querySelector('#tag-target');
  const splitLines=(ctx,text,width)=>{const lines=[];let line='';for(const ch of text){if(ctx.measureText(line+ch).width>width&&line){lines.push(line);line=ch}else line+=ch}if(line)lines.push(line);return lines};
  function poster(){
-  const title=document.querySelector('#recommend-title').textContent.trim();currentTitle=title;
-  root.querySelector('#paper-word').textContent=title;root.querySelector('#paper-read').href=document.querySelector('#recommend-read').getAttribute('href');
-  root.querySelector('#paper-category').textContent=document.querySelector('#recommend-category').textContent;
+  const term=window.WordNotes.getSelected(),title=window.WordNotes.getState()==='closed'?term.scenario:term.title;currentTitle=title;
   tx.fillStyle=colors.paper;tx.fillRect(0,0,640,820);tx.strokeStyle=colors.brand;tx.lineWidth=2;tx.strokeRect(30,30,580,760);
   tx.fillStyle=colors.brand;tx.font='700 22px '+font;tx.fillText('這個詞，是什麼？',56,88);
-  tx.fillRect(56,118,528,2);tx.fillStyle=colors.muted;tx.font='22px '+font;tx.fillText(document.querySelector('#recommend-category').textContent,56,167);
-  tx.fillStyle=colors.brand;const size=title.length<=8?Math.min(86,Math.floor(500/Math.max(1,title.length))):66;tx.font='900 '+size+'px '+font;const lines=splitLines(tx,title,510);if(lines.length>1&&[...lines.at(-1)].length===1){const previous=[...lines[lines.length-2]];lines[lines.length-1]=previous.pop()+lines.at(-1);lines[lines.length-2]=previous.join('')}lines.forEach((line,i)=>tx.fillText(line,56,300+i*(size+23)));
+  tx.fillRect(56,118,528,2);tx.fillStyle=colors.muted;tx.font='22px '+font;tx.fillText('攤開日常，發現名字',56,167);
+  tx.fillStyle=colors.brand;const size=title.length<=8?Math.min(86,Math.floor(500/Math.max(1,title.length))):(title.length>16?40:66);tx.font='900 '+size+'px '+font;const lines=splitLines(tx,title,510);if(lines.length>1&&[...lines.at(-1)].length===1){const previous=[...lines[lines.length-2]];lines[lines.length-1]=previous.pop()+lines.at(-1);lines[lines.length-2]=previous.join('')}lines.forEach((line,i)=>tx.fillText(line,56,300+i*(size+23)));
   tx.fillStyle=colors.accent;tx.beginPath();tx.arc(535,640,39,0,Math.PI*2);tx.fill();tx.fillStyle=colors.brand;tx.font='900 60px '+font;tx.fillText('？',500,662);
   tx.font='27px '+font;tx.fillText('有些日常，',56,665);tx.fillText('原來早就有名字。',56,710);tx.font='18px '+font;tx.fillText('翻讀這個詞 →',56,765);
   // Permanent subtle fold highlights belong to the paper, not the text layout.
@@ -61,10 +59,11 @@
  }
  const cols=18,rows=24,mesh=[];for(let y=0;y<=rows;y++)for(let x=0;x<=cols;x++)mesh.push({u:x/cols,v:y/rows});
  const triangles=[];for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const a=y*(cols+1)+x,b=a+1,c=a+cols+1,d=c+1;if((x+y)%2)triangles.push([a,b,c],[b,d,c]);else triangles.push([a,b,d],[a,d,c])}
- function paperProgress(t){const c=t%12.5;if(c<.8)return[0,'揉成紙團'];if(c<4){const q=(c-.8)/3.2;return[smooth(q),'慢慢攤開']}if(c<9){const rest=c-4;return[1+.014*Math.exp(-5*rest)*Math.sin(rest*10),'攤開，讀一個詞']}if(c<11.8)return[1-smooth((c-9)/2.8),'收回紙團'];return[0,'揉成紙團']}
+ function paperProgress(t){return [.62+.38*smooth(t/1.15),'攤開日常']}
+ function isTap(distance,ms,cancelled=false){return !cancelled&&distance<=8&&ms<=500}
  function drawPaper(){
-  pc.setTransform(dpr,0,0,dpr,0,0);pc.clearRect(0,0,W,H);const [progress,state]=paperFlat||paused&&reduced.matches?[1,'攤平閱讀']:paperProgress(paperTime);
-  if(state!==phase){phase=state;paper.dataset.phase=state;root.querySelector('#paper-phase').textContent=state}
+  pc.setTransform(dpr,0,0,dpr,0,0);pc.clearRect(0,0,W,H);const [progress,state]=[paperTime,'攤開日常'];
+  if(state!==phase){phase=state;paper.dataset.phase=state;paper.dataset.progress=String(progress)}
   const p=clamp(progress,0,1.025),fold=clamp(1-p),fh=Math.min(H*.76,W*1.12),fw=fh*640/820,cx=W/2,cy=H*.44;
   const shadowW=fw*(.23+.33*clamp(p)),shadowH=9+10*clamp(p);pc.save();pc.translate(cx,H*.87);pc.scale(shadowW,shadowH);const shade=pc.createRadialGradient(0,0,0,0,0,1);shade.addColorStop(0,colors.brand+'32');shade.addColorStop(1,colors.brand+'00');pc.fillStyle=shade;pc.beginPath();pc.arc(0,0,1,0,Math.PI*2);pc.fill();pc.restore();
   if(Math.abs(progress-1)<.001){pc.drawImage(texture,cx-fw/2,cy-fh/2,fw,fh);return}
@@ -96,7 +95,7 @@
   for(const b of world.bodies){if(world.time<b.release)continue;const a=b.particles[0],z=b.particles.at(-1),cx=(a.x+z.x)/2,cy=(a.y+z.y)/2,angle=Math.atan2(z.y-a.y,z.x-a.x);tc.save();tc.translate(cx,cy);tc.rotate(angle);tc.beginPath();tc.roundRect(-b.width/2,-b.r,b.width,b.r*2,b.r);tc.fillStyle=[colors.brand,colors.paper,colors.accent][b.style];tc.strokeStyle=colors.brand;tc.fill();tc.stroke();tc.fillStyle=b.style===0?colors.paper:colors.brand;tc.fillText(b.text,0,1);tc.restore()}
  }
  function choices(labels){target.replaceChildren();const links=root.querySelector('#tag-word-links');links.replaceChildren();for(const [i,text] of labels.entries()){const option=document.createElement('option');option.value=i;option.textContent=text;target.append(option);const term=terms.find(t=>t.title===text),el=document.createElement(term?'a':'span');el.textContent=text;if(term)el.href='#'+term.id;links.append(el)}}
- function buildTags(labels){world=new TagWorld(TW,TH,labels,measure);choices(labels);if(paused||reduced.matches)world.settle();idleTime=0;drawTags();status.textContent='目前 '+labels.length+' 個標籤。拖曳甩動，或點空白處震一下。'}
+ function buildTags(labels){if(typeof hidePopover==='function'&&world)hidePopover();world=new TagWorld(TW,TH,labels,measure);choices(labels);if(paused||reduced.matches)world.settle();idleTime=0;drawTags();status.textContent='目前 '+labels.length+' 個標籤。拖曳甩動，或點空白處震一下。'}
  function defaults(){const seen=new Set(),out=[];for(const t of terms)if(!seen.has(t.category)){seen.add(t.category);out.push(t.title)}for(const t of terms)if(out.length<12&&!out.includes(t.title))out.push(t.title);return out}
  let defaultLabels=defaults();input.value=defaultLabels.join('、');
  function resize(force=false){
@@ -106,27 +105,34 @@
  }
  function stop(){cancelAnimationFrame(frame);frame=0;previous=0;accumulator=0;fpsStart=0;fpsFrames=0}
  function permitted(){return visible&&!paused&&!document.hidden&&!readerOpen}
- function loop(now){frame=0;if(!permitted())return;const workStart=performance.now(),elapsed=previous?Math.max(0,(now-previous)/1000):0,delta=Math.min(.05,elapsed);previous=now;paperTime+=elapsed;accumulator+=delta;idleTime+=delta;fpsFrames++;if(!fpsStart)fpsStart=now;if(now-fpsStart>1200){root.dataset.motionFps=String(Math.round(fpsFrames*1000/(now-fpsStart)));fpsStart=now;fpsFrames=0}while(accumulator>=1/120){world.step();accumulator-=1/120}if(idleTime>6&&!world.drag){const b=world.bodies[Math.floor(Math.random()*world.bodies.length)];const p=b.particles[Math.floor(b.particles.length/2)];world.impulse(p.x,p.y+20,b,.55);idleTime=0}drawPaper();drawTags();root.dataset.drawMs=String(Math.round(performance.now()-workStart));frame=requestAnimationFrame(loop)}
+ function loop(now){frame=0;if(!permitted())return;const workStart=performance.now(),elapsed=previous?Math.max(0,(now-previous)/1000):0,delta=Math.min(.05,elapsed);previous=now;paperTime+=elapsed;accumulator+=delta;idleTime+=delta;fpsFrames++;if(!fpsStart)fpsStart=now;if(now-fpsStart>1200){root.dataset.motionFps=String(Math.round(fpsFrames*1000/(now-fpsStart)));fpsStart=now;fpsFrames=0}while(accumulator>=1/120){world.step();accumulator-=1/120}if(idleTime>6&&!world.drag){const b=world.bodies[Math.floor(Math.random()*world.bodies.length)];const p=b.particles[Math.floor(b.particles.length/2)];world.impulse(p.x,p.y+20,b,.55);idleTime=0}drawTags();root.dataset.drawMs=String(Math.round(performance.now()-workStart));frame=requestAnimationFrame(loop)}
  function start(){if(permitted()&&!frame)frame=requestAnimationFrame(loop)}
  function syncPause(){pauseButton.textContent=paused?'播放互動動畫':'暫停互動動畫';pauseButton.setAttribute('aria-pressed',String(paused));if(paused){stop();drawPaper();drawTags()}else start()}
  pauseButton.addEventListener('click',()=>{paused=!paused;syncPause()});
- replay.addEventListener('click',()=>{paperFlat=false;paperTime=0;if(reduced.matches){drawPaper();paper.animate([{opacity:.6},{opacity:1}],{duration:120})}else{paused=false;syncPause()}});
- root.querySelector('#paper-flat').addEventListener('click',()=>{paperFlat=true;drawPaper()});
- paper.addEventListener('click',()=>replay.click());
+ let paperFrame=0,resolvePaper=null;
+ function cancelPaper(){cancelAnimationFrame(paperFrame);paperFrame=0;if(resolvePaper){resolvePaper(false);resolvePaper=null}}
+ function flatPaper(){cancelAnimationFrame(paperFrame);paperTime=1;drawPaper();if(resolvePaper){resolvePaper(true);resolvePaper=null}}
+ window.WordPaper={reset(){cancelPaper();paperTime=.62;poster();drawPaper()},reveal(){cancelPaper();poster();if(reduced.matches){paperTime=1;drawPaper();return Promise.resolve(true)}return new Promise(resolve=>{resolvePaper=resolve;const start=performance.now();function tick(now){paperTime=paperProgress((now-start)/1000)[0];drawPaper();if(now-start>=1150){flatPaper();return}paperFrame=requestAnimationFrame(tick)}paperFrame=requestAnimationFrame(tick)})}};
  tagReset.addEventListener('click',()=>{world.reset();if(paused)world.settle();idleTime=0;drawTags();start()});
  root.querySelector('#tag-nudge').addEventListener('click',()=>{const b=world.bodies[Number(target.value)||0],p=b.particles[Math.floor(b.particles.length/2)];world.impulse(p.x,p.y+28,b);if(paused){for(let i=0;i<45;i++)world.step();drawTags()}else start()});
  form.addEventListener('submit',e=>{e.preventDefault();const labels=input.value.split('、').map(t=>t.trim()).filter(Boolean);if(!labels.length||labels.length>16||labels.some(t=>[...t].length>12)){status.textContent='請輸入1–16個標籤，以頓號「、」分隔，每個最多12字。';input.setAttribute('aria-invalid','true');input.focus();return}input.removeAttribute('aria-invalid');buildTags(labels);start()});
  function point(e){const b=tags.getBoundingClientRect();return{x:e.clientX-b.left,y:e.clientY-b.top,t:performance.now()}}
- tags.addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=point(e),b=world.hit(p.x,p.y);tags.setPointerCapture(e.pointerId);idleTime=0;samples=[p];if(b){world.grab(b,p.x,p.y);tags.classList.add('is-grabbing')}else{world.impulse(p.x,p.y);if(paused){for(let i=0;i<40;i++)world.step();drawTags()}}});
- tags.addEventListener('pointermove',e=>{if(!world.drag)return;const p=point(e);world.move(p.x,p.y);samples.push(p);samples=samples.filter(s=>p.t-s.t<110);if(paused){for(let i=0;i<4;i++)world.step();drawTags()}});
- function release(e){if(!tags.hasPointerCapture(e.pointerId))return;const p=point(e),first=samples[0]||p,ms=Math.max(16,p.t-first.t);world.release((p.x-first.x)*1000/ms,(p.y-first.y)*1000/ms);tags.releasePointerCapture(e.pointerId);tags.classList.remove('is-grabbing');if(paused){world.settle();drawTags()}start()}
- tags.addEventListener('pointerup',release);tags.addEventListener('pointercancel',e=>{world.release();if(tags.hasPointerCapture(e.pointerId))tags.releasePointerCapture(e.pointerId);tags.classList.remove('is-grabbing')});tags.addEventListener('lostpointercapture',()=>{if(world.drag)world.release();tags.classList.remove('is-grabbing')});
- document.addEventListener('word:recommended',()=>{poster();drawPaper()});
+ const pop=root.querySelector('#tag-popover'),popRead=root.querySelector('#tag-popover-read');let gesture=null;
+ function hidePopover(){pop.hidden=true}
+ function showPopover(b,focus=false){const term=terms.find(t=>t.title===b.text);if(!term){hidePopover();status.textContent='這個自訂標籤尚無站內文章，仍然可以拖曳。';return}root.querySelector('#tag-popover-title').textContent=term.title;root.querySelector('#tag-popover-scenario').textContent=term.scenario;popRead.href='#'+term.id;popRead.dataset.termId=term.id;pop.hidden=false;const a=b.particles[0],z=b.particles.at(-1),r=tags.getBoundingClientRect(),pr=pop.getBoundingClientRect();const x=(a.x+z.x)/2,y=(a.y+z.y)/2;pop.style.left=clamp(x-pr.width/2,8,Math.max(8,TW-pr.width-8))+'px';const low=Math.max(8,-r.top+8),high=Math.min(TH-pr.height-8,innerHeight-r.top-pr.height-8);pop.style.top=clamp(y-pr.height-30,low,Math.max(low,high))+'px';if(focus)popRead.focus({preventScroll:true})}
+ root.querySelector('#tag-popover-close').addEventListener('click',()=>{hidePopover();target.focus({preventScroll:true})});pop.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();hidePopover();target.focus()}});
+ popRead.addEventListener('click',e=>{e.preventDefault();window.WordNotes.open(popRead.dataset.termId,popRead)});
+ const inspect=document.createElement('button');inspect.type='button';inspect.textContent='看這個詞 →';root.querySelector('.tag-keyboard').append(inspect);inspect.addEventListener('click',()=>showPopover(world.bodies[Number(target.value)||0],true));
+ tags.addEventListener('pointerdown',e=>{if(e.button!==0||gesture)return;const p=point(e),b=world.hit(p.x,p.y);hidePopover();tags.setPointerCapture(e.pointerId);idleTime=0;samples=[p];gesture={id:e.pointerId,b,start:p,distance:0};if(b){world.grab(b,p.x,p.y);tags.classList.add('is-grabbing')}else{world.impulse(p.x,p.y);if(paused){for(let i=0;i<40;i++)world.step();drawTags()}}});
+ tags.addEventListener('pointermove',e=>{if(!gesture||gesture.id!==e.pointerId)return;const p=point(e);gesture.distance=Math.max(gesture.distance,Math.hypot(p.x-gesture.start.x,p.y-gesture.start.y));if(!world.drag)return;world.move(p.x,p.y);samples.push(p);samples=samples.filter(s=>p.t-s.t<110);if(paused){for(let i=0;i<4;i++)world.step();drawTags()}});
+ function release(e,cancelled=false){if(!gesture||gesture.id!==e.pointerId)return;const g=gesture,p=point(e),first=samples[0]||p,ms=Math.max(16,p.t-first.t);gesture=null;world.release((p.x-first.x)*1000/ms,(p.y-first.y)*1000/ms);if(tags.hasPointerCapture(e.pointerId))tags.releasePointerCapture(e.pointerId);tags.classList.remove('is-grabbing');if(paused){world.settle();drawTags()}if(g.b&&isTap(Math.max(g.distance,Math.hypot(p.x-g.start.x,p.y-g.start.y)),p.t-g.start.t,cancelled))showPopover(g.b);start()}
+ tags.addEventListener('pointerup',e=>release(e));tags.addEventListener('pointercancel',e=>release(e,true));tags.addEventListener('lostpointercapture',()=>{gesture=null;if(world.drag)world.release();tags.classList.remove('is-grabbing')});
+ document.addEventListener('word:recommended',()=>window.WordPaper.reset());
  const io=new IntersectionObserver(entries=>{visible=entries.some(e=>e.isIntersecting);if(visible)start();else stop()},{threshold:.05});io.observe(root);
- document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else start()});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(resolvePaper)flatPaper()}else start()});
  const dialog=document.querySelector('.reader');if(dialog)new MutationObserver(()=>{readerOpen=dialog.open;if(readerOpen)stop();else start()}).observe(dialog,{attributes:true,attributeFilter:['open']});
- reduced.addEventListener('change',()=>{paused=reduced.matches;world.release();if(paused)world.settle();syncPause()});
- new ResizeObserver(resize).observe(root.querySelector('.lab-grid'));
- poster();resize();root.classList.add('canvas-ready');root.querySelectorAll('[hidden]').forEach(el=>{el.hidden=false});syncPause();
+ reduced.addEventListener('change',()=>{paused=reduced.matches;if(reduced.matches&&resolvePaper)flatPaper();world.release();if(paused)world.settle();syncPause()});
+ const resizeObserver=new ResizeObserver(()=>resize());resizeObserver.observe(tags.parentElement);resizeObserver.observe(paper.parentElement);
+ paperTime=.62;poster();resize();root.classList.add('canvas-ready');paper.parentElement.classList.add('canvas-ready');for(const el of [pauseButton,tagReset,form,root.querySelector('.tag-keyboard')])el.hidden=false;syncPause();
  document.fonts.ready.then(()=>{poster();resize(true)});
 })();
