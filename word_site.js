@@ -70,6 +70,7 @@
   pickLink.setAttribute('href','#'+card.id);
   document.querySelector('#slip-read').setAttribute('href','#'+card.id);
   document.querySelector('#slip-title').textContent=card.querySelector('h2').textContent;
+  document.dispatchEvent(new CustomEvent('word:recommended',{detail:{id:card.id}}));
  }
  async function recommend(withMotion=true){
   const target=choose(),token=++pickVersion;pendingPick=target;
@@ -193,6 +194,7 @@
  pickLink.addEventListener('click',event=>{if(typeof reader.showModal==='function'){event.preventDefault();enter(recommended,pickLink)}});
  document.querySelector('#slip-read').addEventListener('click',event=>{if(typeof reader.showModal==='function'){event.preventDefault();enter(recommended,event.currentTarget)}});
  document.querySelector('.start-reading').addEventListener('click',event=>{if(typeof reader.showModal==='function'){event.preventDefault();enter(recommended,event.currentTarget)}});
+ document.querySelector('#paper-read')?.addEventListener('click',event=>{const card=cards.find(c=>'#'+c.id===event.currentTarget.getAttribute('href'));if(card&&typeof reader.showModal==='function'){event.preventDefault();enter(card,event.currentTarget)}});
  prev.addEventListener('click',()=>turn(-1));next.addEventListener('click',()=>turn(1));close.addEventListener('click',exit);
  reader.addEventListener('cancel',event=>{event.preventDefault();exit()});
  reader.addEventListener('keydown',event=>{

@@ -4,10 +4,11 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="日常詞彙的奇想閱讀室。用白話解釋、生活例子與可信來源，認識心理、城市、數位與社會中的詞彙。">
 <meta name="theme-color" content="#332447"><title>這個詞，是什麼？｜日常詞彙的奇想閱讀室</title>
-<link rel="stylesheet" href="./word_site.css?v=5fd5754d9860">
+<link rel="stylesheet" href="./word_site.css?v=5c0f8d83c7c1">
 <script>window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments);}window.dataLayer.push({'gtm.start':Date.now(),event:'gtm.js'});</script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-TCWN35KS"></script>
-<script defer src="./word_site.js?v=cae040b9962a"></script>
+<script defer src="./word_site.js?v=44f8b3df26eb"></script>
+<script defer src="./word_motion_lab.js?v=f494dfbdb97e"></script>
 </head><body>
 <a class="skip-link" href="#word-index">跳到詞彙索引</a>
 <header class="room" id="top">
@@ -21,6 +22,18 @@
 <aside class="word-slip" aria-label="從門內發現的詞彙"><button class="slip-dismiss" type="button" aria-label="收起詞彙紙卡">×</button><a id="slip-read" href="#term-023"><span>今天發現的詞</span><strong id="slip-title">公地悲劇</strong><span class="slip-cta">翻讀這個詞 →</span></a></aside>
 <main>
  <section class="selection" id="recommendation" aria-labelledby="recommend-heading"><div class="selection-side"><span class="section-no">01 / RANDOM WORD</span><h2 id="recommend-heading">隨機來<br>一個詞。</h2><p>讓好奇心幫你挑選。<br>每次換一個，打開不同的日常。</p></div><div class="home-recommendation"><div class="recommend-content"><div class="recommend-meta"><span id="recommend-number">023</span><span id="recommend-category">日常經濟</span><span class="selection-marker" aria-hidden="true">↗</span></div><div class="recommend-title-row"><span class="guide-dock" aria-hidden="true"></span><h3 id="recommend-title">公地悲劇</h3></div><p id="recommend-text">辦公室茶水間的公用零食，為什麼常常一下就被拿光，最後卻沒有人願意主動補充？這背後其實隱含著共享資源面臨耗竭的經典困境。</p></div><div class="recommend-actions"><a class="primary" id="recommend-read" href="#term-023">翻讀這個詞 →</a><div class="switch-control"><button id="recommend-another" type="button" hidden>換一個詞 ↻</button><span class="switch-dock" aria-hidden="true"></span></div></div></div></section>
+
+ <section class="motion-lab" id="word-motion-lab" aria-labelledby="lab-title">
+  <div class="lab-heading"><div><span class="section-no">好奇心的遊戲室</span><h2 id="lab-title">把好奇心，<br>攤開來。</h2></div><div><p>揉開一張詞彙海報，<br>再讓日常的名字自由落下。</p><button id="lab-pause" type="button" aria-pressed="false" hidden>暫停互動動畫</button></div></div>
+  <div class="lab-grid">
+   <figure class="paper-study"><div class="study-heading"><h3>一張紙，一個詞。</h3><button id="paper-replay" type="button" hidden>重播揉紙 ↻</button></div><div class="paper-stage"><canvas id="paper-canvas" aria-hidden="true"></canvas><div class="paper-fallback"><span>這個詞，是什麼？</span><strong>公地悲劇</strong><p>有些日常，原來早就有名字。</p></div></div><figcaption><span id="paper-category">日常經濟</span><a id="paper-read" href="#term-023">翻讀「<strong id="paper-word">公地悲劇</strong>」 →</a><button id="paper-flat" type="button" hidden>攤平閱讀</button><span id="paper-phase" aria-hidden="true">詞彙海報</span></figcaption></figure>
+   <div class="tag-study"><div class="study-heading"><h3>讓名字，落在一起。</h3><button id="tag-reset" type="button" hidden>重新落下 ↓</button></div><p class="tag-instructions" id="tag-instructions">抓住標籤拖曳、甩動；點空白處，讓附近的詞跳起來。</p><div class="tag-stage"><canvas id="tag-canvas" aria-hidden="true"></canvas><div class="tags-fallback" aria-hidden="true"><span>城市與空間</span><span>數位生活</span><span>日常經濟</span><span>設計與無障礙</span></div></div>
+    <div class="tag-keyboard" hidden><label for="tag-target">挑選標籤<select id="tag-target"></select></label><button id="tag-nudge" type="button">彈起這個詞 ↑</button></div>
+    <form id="tag-form" hidden><label for="tag-text">換成你想玩的名字<span>用頓號「、」分隔，最多16個，每個最多12字。</span></label><div><input id="tag-text" type="text" maxlength="220" aria-describedby="tag-status" autocomplete="off"><button type="submit">換一堆 ↻</button></div></form><p id="tag-status" class="lab-status" role="status" aria-live="polite"></p>
+   </div>
+  </div>
+  <details class="tag-reading"><summary>想讀剛剛的詞？打開閱讀入口</summary><div id="tag-word-links"><a href="#word-index">前往完整詞彙索引 →</a></div><p>自訂標籤只是互動文字；已有收錄的詞才會提供閱讀連結。</p></details>
+ </section>
  <section class="index-section" id="word-index" aria-labelledby="index-title"><div class="index-heading"><div><span class="section-no">02 / THE INDEX</span><h2 id="index-title">每個名字，<br>都通往一段日常。</h2></div><p>白話解釋 ／ 生活例子 ／ 界線與觀察<br><span>目前收錄 24 則詞彙</span></p></div>
  <div class="index-tools" hidden><div class="filters" role="group" aria-label="詞彙分類"><button type="button" data-filter="all" aria-pressed="true">全部 <span>24</span></button><button type="button" data-filter="psychology" aria-pressed="false">心理與思考 <span>10</span></button><button type="button" data-filter="urban" aria-pressed="false">城市與空間 <span>3</span></button><button type="button" data-filter="digital" aria-pressed="false">數位生活 <span>2</span></button><button type="button" data-filter="society" aria-pressed="false">社會與日常 <span>3</span></button><button type="button" data-filter="design" aria-pressed="false">設計與無障礙 <span>3</span></button><button type="button" data-filter="everyday" aria-pressed="false">日常經濟 <span>3</span></button></div><div class="search-row"><label for="search">找一個詞<input id="search" type="search" placeholder="詞彙、分類或關鍵字" autocomplete="off"></label><p id="count" role="status" aria-live="polite">共 24 則</p></div></div>
  <noscript><p>所有詞彙都在下方，點「閱讀詞彙筆記」即可閱讀。也可用瀏覽器的尋找功能。</p></noscript>
