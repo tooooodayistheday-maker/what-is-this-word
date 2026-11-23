@@ -53,7 +53,7 @@
   tx.fillStyle=colors.paper;tx.fillRect(0,0,640,820);tx.strokeStyle=colors.brand;tx.lineWidth=2;tx.strokeRect(30,30,580,760);
   tx.fillStyle=colors.brand;tx.font='700 22px '+font;tx.fillText('這個詞，是什麼？',56,88);
   tx.fillRect(56,118,528,2);tx.fillStyle=colors.muted;tx.font='22px '+font;tx.fillText(document.querySelector('#recommend-category').textContent,56,167);
-  tx.fillStyle=colors.brand;const size=title.length>8?66:86;tx.font='900 '+size+'px '+font;const lines=splitLines(tx,title,510);lines.forEach((line,i)=>tx.fillText(line,56,300+i*(size+23)));
+  tx.fillStyle=colors.brand;const size=title.length<=8?Math.min(86,Math.floor(500/Math.max(1,title.length))):66;tx.font='900 '+size+'px '+font;const lines=splitLines(tx,title,510);if(lines.length>1&&[...lines.at(-1)].length===1){const previous=[...lines[lines.length-2]];lines[lines.length-1]=previous.pop()+lines.at(-1);lines[lines.length-2]=previous.join('')}lines.forEach((line,i)=>tx.fillText(line,56,300+i*(size+23)));
   tx.fillStyle=colors.accent;tx.beginPath();tx.arc(535,640,39,0,Math.PI*2);tx.fill();tx.fillStyle=colors.brand;tx.font='900 60px '+font;tx.fillText('？',500,662);
   tx.font='27px '+font;tx.fillText('有些日常，',56,665);tx.fillText('原來早就有名字。',56,710);tx.font='18px '+font;tx.fillText('翻讀這個詞 →',56,765);
   // Permanent subtle fold highlights belong to the paper, not the text layout.
