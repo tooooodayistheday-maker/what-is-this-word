@@ -8,8 +8,8 @@
    this.time=0;this.drag=null;
    this.bodies=this.labels.map((text,i)=>{
     const r=this.options.radius||17,width=Math.min(this.w-24,Math.max(68,this.measure(text)+32)),count=Math.min(9,Math.max(3,Math.ceil((width-2*r)/19)+1));
-    const length=width-2*r,angle=Math.sin(i*2.31)*.7,cx=width/2+22+Math.max(0,this.w-width-44)*(this.options.position?this.options.position(i,this.labels.length):(i*.6180339)%1),cy=-35-(i%3)*30;
-    const particles=Array.from({length:count},(_,j)=>{const d=(j/(count-1)-.5)*length;const x=cx+Math.cos(angle)*d,y=cy+Math.sin(angle)*d;return{x,y,px:x-.2*Math.cos(i),py:y,r}});
+    const length=width-2*r,angle=this.options.angle?this.options.angle(i):Math.sin(i*2.31)*.7,cx=width/2+22+Math.max(0,this.w-width-44)*(this.options.position?this.options.position(i,this.labels.length):(i*.6180339)%1),cy=-35-(i%3)*30;
+    const particles=Array.from({length:count},(_,j)=>{const d=(j/(count-1)-.5)*length;const x=cx+Math.cos(angle)*d,y=cy+Math.sin(angle)*d;return{x,y,px:x-(this.options.readableFirst&&i<3?.035*(i-1):.2*Math.cos(i)),py:y,r}});
     const constraints=[];for(let a=0;a<count;a++)for(let b=a+1;b<count;b++)constraints.push([a,b,length*(b-a)/(count-1)]);
     return{text,width,r,particles,constraints,release:this.options.release?this.options.release(i,this.labels.length):i*.08,landed:false,style:i%3};
    });
@@ -32,11 +32,12 @@
    }
   }
  }
- if(typeof module!=='undefined'&&module.exports)module.exports={TagWorld,isTap,pickLabels,entryRelease};
+ if(typeof module!=='undefined'&&module.exports)module.exports={TagWorld,isTap,pickLabels,entryRelease,entryOptions};
  if(typeof document==='undefined')return;
  function isTap(distance,ms,cancelled=false){return !cancelled&&distance<=8&&ms<=500}
  function pickLabels(terms,mobile,random=Math.random){const labels=[...new Set(terms.map(t=>t.title))];for(let i=labels.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[labels[i],labels[j]]=[labels[j],labels[i]]}return labels.slice(0,mobile?12:20)}
  function entryRelease(i,n){const second=Math.ceil((n-3)/2);return i<3?i*.055:i<3+second?.23+(i-3)*.025:.46+(i-3-second)*.018}
+ function entryOptions(mobile){return {radius:mobile?21:27,release:entryRelease,readableFirst:true,angle:i=>i<3?[-.035,.025,-.02][i]:Math.sin(i*2.31)*.7,position(i,n){if(i<3)return [.12,.5,.88][i];const batch=i<3?0:i<3+Math.ceil((n-3)/2)?1:2;return .04+.92*((batch*.31+i*.6180339)%1)}}}
  const root=document.querySelector('#word-motion-lab');if(!root)return;
  const tags=root.querySelector('#tag-canvas'),tc=tags.getContext('2d');if(!tc){window.WordIntro?.finish('canvas-unavailable');return}
  const reduced=matchMedia('(prefers-reduced-motion: reduce)'),css=getComputedStyle(document.documentElement);
@@ -89,7 +90,7 @@
   const rect=overlay.getBoundingClientRect(),w=rect.width,h=rect.height,ratio=Math.min(devicePixelRatio||1,1.75),size=mobile.matches?18:25;
   canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);ctx.font='600 '+size+'px '+font;
   const labels=pickLabels(terms,mobile.matches),second=Math.ceil((labels.length-3)/2),lastStart=Math.min(labels.length-1,3+second);
-  let pile=new TagWorld(w,h,labels,t=>ctx.measureText(t).width,{radius:mobile.matches?21:27,release:entryRelease,position(i,n){const batch=i<3?0:i<3+Math.ceil((n-3)/2)?1:2;return .04+.92*((batch*.31+i*.6180339)%1)}}),entryFrame=0,exitAnimation=null,exitTimer=0,ended=false,exiting=false,started=performance.now();
+  let pile=new TagWorld(w,h,labels,t=>ctx.measureText(t).width,entryOptions(mobile.matches)),entryFrame=0,exitAnimation=null,exitTimer=0,ended=false,exiting=false,started=performance.now();
   overlay.dataset.count=String(labels.length);overlay.dataset.phase='falling';overlay.dataset.frames='0';let frames=0;
   const cleanup=()=>{if(ended)return;ended=true;clearTimeout(exitTimer);cancelAnimationFrame(entryFrame);entryFrame=0;exitAnimation?.cancel();pile=null;overlay.dataset.phase='done';overlay.dataset.running='false';overlay.dataset.frames=String(frames);overlay.dataset.durationMs=String(Math.round(performance.now()-started));removeEventListener('resize',onResize)};
   const onResize=()=>state.finish('resize');addEventListener('resize',onResize,{once:true});document.addEventListener('word:intro-finished',cleanup,{once:true});
