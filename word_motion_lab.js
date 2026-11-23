@@ -84,7 +84,7 @@
 
  // The entry owns its world, clock, frame and exit; it never borrows the game loop.
  function startEntry(){
-  const state=window.WordIntro;if(!state?.active)return;
+  const state=window.WordIntro;if(!state?.active)return;clearTimeout(state.guard);state.guard=setTimeout(()=>state.finish('fallback'),2600);
   const overlay=document.querySelector('#word-entry'),canvas=document.querySelector('#entry-canvas'),ctx=canvas.getContext('2d');if(!ctx){state.finish('canvas-unavailable');return}
   const rect=overlay.getBoundingClientRect(),w=rect.width,h=rect.height,ratio=Math.min(devicePixelRatio||1,1.75),size=mobile.matches?18:25;
   canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);ctx.font='600 '+size+'px '+font;
