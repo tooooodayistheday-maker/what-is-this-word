@@ -4,6 +4,9 @@
  if(!cards.length)return;
  const terms=cards.map(card=>Object.freeze({id:card.id,title:card.querySelector('h2').textContent.trim(),category:card.dataset.category,categoryLabel:card.querySelector('.term-category').textContent,number:card.querySelector('.term-number').textContent,summary:card.dataset.recommendationSummary,scenario:card.dataset.scenario}));
  const motion=matchMedia('(prefers-reduced-motion: reduce)');
+ const intro=window.WordIntro,entry=document.querySelector('#word-entry');
+ if(intro?.active){const background=[...document.querySelectorAll('body>.skip-link,body>header,body>main,body>footer,body>.word-slip')],prior=background.map(el=>el.inert),overflow=document.body.style.overflow;document.body.style.overflow='hidden';background.forEach(el=>el.inert=true);document.querySelector('#entry-skip').focus({preventScroll:true});document.addEventListener('word:intro-finished',event=>{background.forEach((el,i)=>el.inert=prior[i]);document.body.style.overflow=overflow;if(event.detail.reason!=='route'&&(event.detail.reason==='skip'||entry.contains(document.activeElement)))document.querySelector('.start-reading').focus({preventScroll:true})},{once:true})}
+
  const query=document.querySelector('#search'),buttons=[...document.querySelectorAll('[data-filter]')];
  const count=document.querySelector('#count'),empty=document.querySelector('#empty');
  const track=(event,params={})=>{if(typeof gtag==='function')gtag('event',event,{...params,send_to:'G-7MSJNH4L4Q'})};
@@ -71,9 +74,9 @@
   answer.hidden=true;answer.inert=true;
   ['recommend-title','recommend-category','recommend-number','recommend-text'].forEach(id=>document.getElementById(id).textContent='');
   pickLink.setAttribute('href','#recommendation');
-  revealButton.hidden=false;revealButton.disabled=false;revealButton.textContent='攤開看答案';revealButton.setAttribute('aria-expanded','false');
+  revealButton.hidden=false;revealButton.disabled=false;revealButton.textContent='揭曉詞名';revealButton.setAttribute('aria-expanded','false');
   document.querySelector('#slip-read').setAttribute('href','#recommendation');document.querySelector('#slip-title').textContent=term.scenario;
-  discoveryStatus.textContent='紙上是一個生活情境，攤開後揭曉答案。';
+  discoveryStatus.textContent='先想想這個生活情境，再揭曉詞名。';
   document.dispatchEvent(new CustomEvent('word:recommended',{detail:{id:card.id}}));
  }
  function recommend(){++pickVersion;resetSwitch();renderPick(choose());requestAnimationFrame(()=>refreshStoryAnchors())}
@@ -86,10 +89,7 @@
   discoveryStatus.textContent='原來，這個詞叫「'+term.title+'」。';if(shouldFocus&&!document.querySelector('.reader[open]'))document.querySelector('#recommend-title').focus({preventScroll:true});
   document.dispatchEvent(new CustomEvent('word:revealed',{detail:{id:term.id}}));requestAnimationFrame(()=>refreshStoryAnchors());
  }
- async function revealAnswer(){
-  if(discoveryState!=='closed')return;const token=++pickVersion;discoveryState='opening';pick.dataset.state='opening';revealButton.disabled=true;revealButton.textContent='正在攤開…';discoveryStatus.textContent='正在攤開紙張。';
-  try{const result=window.WordPaper?await window.WordPaper.reveal(selectedTerm()):true;if(result!==false)finishReveal(token)}catch{finishReveal(token)}
- }
+ function revealAnswer(){if(discoveryState!=='closed')return;const token=++pickVersion;discoveryState='opening';pick.dataset.state='opening';finishReveal(token)}
  renderPick(choose());revealButton.hidden=false;document.querySelector('#recommend-another').hidden=false;
  revealButton.addEventListener('click',revealAnswer);
  document.querySelector('#recommend-another').addEventListener('click',()=>{recommend();track('word_recommendation_change',meta(recommended))});
@@ -197,19 +197,8 @@
   if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5)turn(dx>0?1:-1);
  },{passive:true});
 
- // Distinct title lines and objects arrive in under 1.2 seconds; controls stay live.
+ // The entry reveals an already-loaded hero; automatic lens motion follows its exit.
  const entrance=[];
- if(!location.hash&&!motion.matches){
-  const introDrop=matchMedia('(max-width:700px)').matches?32:64;
-  document.querySelectorAll('h1 > span').forEach((line,i)=>entrance.push(animate(line,[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:480,delay:i*100,fill:'backwards'})));
-  entrance.push(animate(document.querySelector('.question'),[{opacity:0,transform:'rotate(-14deg) translateY(10px)'},{opacity:1,transform:'rotate(0deg) translateY(0)'}],{duration:400,delay:260,fill:'backwards'}));
-  const heroDot=document.querySelector('.curiosity-dot');
-  const landing=animate(heroDot,[{transform:'translateY(-'+introDrop+'px) scale(.85,1.12)'},{transform:'translateY(0) scale(1.28,.72)',offset:.52},{transform:'translateY(-12px) scale(.92,1.08)',offset:.72},{transform:'translateY(0) scale(1.08,.92)',offset:.9},{transform:'translateY(0) scale(1)'}],{duration:800});
-  entrance.push(landing);
-  const settleDot=()=>{if(heroDot.parentElement===guideHome)heroDot.style.transform='translateY(0) scale(1)';landing?.cancel()};
-  landing?.finished.then(settleDot,settleDot);
-  [['.book',180],['.door',300],['.lens',420]].forEach(([selector,delay])=>entrance.push(animate(document.querySelector('.room-props '+selector),[{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:600,delay,fill:'backwards'})));
- }
  // One finite paper turn: curled outer edge, moving crease, soft landing.
  const bookSurface=document.querySelector('.book-surface');
  const paper=bookSurface?.querySelector('.turning-page');
@@ -230,7 +219,7 @@
  }
  bookSurface?.addEventListener('pointerenter',flipPage);
  // Mobile gets the same finite entrance turn, without requiring hover.
- if(!location.hash&&!motion.matches)pageTimer=setTimeout(flipPage,1100);
+ // The entry handoff owns automatic motion; the book remains interactive on hover.
  motion.addEventListener('change',()=>{if(motion.matches){clearTimeout(pageTimer);restPage()}});
 
  // Scroll narrative: fixed frame + independent clipped leaf, a note and doorway light.
@@ -270,7 +259,7 @@
   const current=lensAnimation;current?.finished.then(()=>{if(lensAnimation===current){lens.style.transform=park;current.cancel()}},()=>{});
  }
  const lensTrigger=document.querySelector('.lens-trigger');lensTrigger.addEventListener('click',insight);lensTrigger.addEventListener('pointerenter',()=>{if(fine.matches)insight()});
- if(!location.hash)setTimeout(insight,650);else magnify(false);
+ magnify(false);if(intro?.active)document.addEventListener('word:intro-finished',event=>{if(!motion.matches&&event.detail.reason!=='route'&&(!location.hash||location.hash==='#top'))requestAnimationFrame(insight)},{once:true});else if(intro?.wasActive&&!motion.matches&&(!location.hash||location.hash==='#top'))requestAnimationFrame(insight);
  const lensTimer=0;
  const clamp=n=>Math.max(0,Math.min(1,n));
  const storyCaption=document.querySelector('.story-caption'),replay=document.querySelector('.replay-intro');
