@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>詞彙服務 API 與 MCP 串接評估文件</title><meta name="description" content="供整合平台與 AI 評估詞彙服務 REST API 與 MCP 的連線方式、驗證、工具及測試條件。"><style>
+:root{--ink:#292333;--brand:#332447;--paper:#f7f3e8;--sage:#dce5d4;--lime:#d5ef70}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.8 system-ui,'Microsoft JhengHei',sans-serif}header{background:var(--brand);color:var(--paper);padding:52px max(24px,calc((100vw - 960px)/2))}h1{font-size:clamp(28px,5vw,42px);line-height:1.3}header p{max-width:820px}main{max-width:1008px;margin:auto;padding:28px 24px 80px}h2{margin-top:48px;line-height:1.4}h3{margin-top:28px}a{color:inherit;text-underline-offset:4px;overflow-wrap:anywhere}nav{display:flex;gap:12px;flex-wrap:wrap}nav a{background:var(--sage);padding:8px 14px;border-radius:20px;text-decoration:none}pre{background:#e9e6dc;padding:20px;white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.65 Consolas,monospace;border-radius:8px}code{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:15px}td,th{text-align:left;border-bottom:1px solid #b8b4bb;padding:12px;vertical-align:top;overflow-wrap:anywhere}th{background:var(--sage)}.table-wrap{overflow-x:auto}section{scroll-margin-top:24px}a:focus-visible{outline:3px solid #7164a2;outline-offset:4px}.status{background:var(--sage);padding:18px 22px}footer{border-top:1px solid #b8b4bb;margin-top:48px;padding-top:20px;font-size:14px}@media(max-width:600px){header{padding:32px 20px}main{padding:24px 20px 56px}td,th{padding:9px}pre{padding:14px}}
+</style></head><body><header><p>這個詞，是什麼？ · 整合技術文件 · 2026-11-27</p><h1>API 與 MCP 串接評估</h1><p>本頁可直接交給整合平台的 AI。請依平台實際能力選擇 REST API、MCP，或兩者並存；不要僅依端點存在或服務已部署，就宣告串接成功。</p></header><main>
+<nav aria-label="文件目錄"><a href="#decision">給平台 AI 的任務</a><a href="#status">驗證狀態</a><a href="#api">REST API</a><a href="#mcp">MCP</a><a href="#tests">驗收方式</a></nav>
+<section id="decision"><h2>請平台 AI 判斷的事項</h2><p>目標是在平台內搜尋詞彙、取得生活情境與三幕正文，或隨機抽取一個詞。若平台具備 AI Agent 與真正的 MCP 用戶端，可以評估 MCP；若只提供 GET 資料連接器、排程同步或欄位對應，使用 REST API。</p><pre>請閱讀本頁並檢查你所在平台的實際功能：
+1. 是否支援遠端 MCP over HTTP，而不只是一般 GET API？
+2. 是否能執行 MCP 初始化、tools/list、tools/call，並讓 AI 選擇工具？
+3. 是否支援此服務所需的登入與 OAuth 授權，包括伺服器端權杖維護？
+4. 若無 MCP，是否能透過 GET、HTTP Header 驗證及游標分頁讀取 REST API？
+請分別回答「原生支援」「需要轉接程式」「不支援」「尚無證據」。
+最後建議採用 API、MCP 或混合方案，列出設定、實測證據及阻礙。
+未實測請寫「尚未驗證」，不要假設驗證選項或編造測試成功。
+正式推播與批次同步請排除 is_test=true 的測試資料。
+不要在回覆、文件或公開紀錄中輸出任何金鑰。</pre>
+<div class="table-wrap"><table><thead><tr><th>比較項目</th><th>REST API</th><th>MCP</th></tr></thead><tbody><tr><td>呼叫方式</td><td>GET 路徑與查詢參數</td><td>POST JSON-RPC；由 MCP 用戶端管理協定</td></tr><tr><td>適合用途</td><td>排程抓取、同步、Bot 推播、欄位對應</td><td>AI 主動搜尋、讀取、隨機抽詞</td></tr><tr><td>資料範圍</td><td>詞彙；另有獨立河狸 API</td><td>目前只有詞彙三項工具</td></tr><tr><td>驗證</td><td>Bearer、X-API-Key、Basic 三選一</td><td>Sites 平台登入與存取檢查；外部客戶端授權待驗證</td></tr><tr><td>分頁與增量</td><td>支援 cursor、updated_after</td><td>搜尋最多 10 筆；未提供批次分頁或增量工具</td></tr></tbody></table></div></section>
+<section id="status"><h2>已知狀態與限制</h2><div class="status"><strong>程式與部署已完成，跨平台 MCP 連線仍未驗證成功。</strong><p>詞彙 MCP 已部署，ChatGPT 個人外掛名稱已確認為「這個詞，是什麼？」。本機協定與工具測試通過；先前外部 Python 用戶端連線曾遇到 HTTP 403（Cloudflare browser_signature_banned），因此不能視為第三方平台已可直接使用。請正常檢查網路與授權，勿以偽裝客戶端繞過限制。</p></div><p>由 Sites 自動建立的 ChatGPT 個人工具，不等於已公開上架或所有帳號可安裝。網站公開也不代表 MCP 無須驗證。尚未以 WorksHub+、其他使用者 ChatGPT 或其他 AI 平台完成端到端驗收。</p><p>服務端程式以 JavaScript Worker 執行，讀取 GitHub Pages 公開 JSON，不需要作者電腦持續開機。來源可快取約 60 秒。既有託管安排以 2026-12-31 到期為前提；不應假定此網址永久可用，正式使用前須確認續存安排與託管方案限制。本頁不承諾無限請求或永久免費。</p></section>
+<section id="api"><h2>REST API 連線設定</h2><p>詞彙 Base URL：</p><pre>https://workshub-word-notes-api.tooooodayistheday.chatgpt.site</pre><p>名稱已獨立命名，網址為維持既有串接保留舊字樣。API 僅接受 GET；回應為 <code>application/json; charset=utf-8</code>。以下範例皆為格式示意，不含可用憑證。</p><h3>驗證每次擇一</h3><pre>Authorization: Bearer &lt;WORDS_BEARER_TOKEN&gt;
+或
+X-API-Key: &lt;WORDS_API_KEY&gt;
+或
+Authorization: Basic &lt;Base64(username:password)&gt;</pre><p>Basic 使用平台的使用者名稱與密碼欄位產生標頭。不要把憑證放進網址；不要同時送 Authorization 與 X-API-Key。憑證由服務擁有者另行提供，詞彙與河狸各自使用對應憑證。</p>
+<h3>詞彙路徑</h3><pre>GET /api/v1/words
+GET /api/v1/words/{id}
+GET /api/v1/words/latest
+GET /api/v1/words/random
+GET /api/v1/categories</pre><p>單筆、最新與隨機端點直接回傳物件；清單回傳下列封套。ID 使用字串，保留前導零，例如 <code>003</code>。</p><pre>{"data":[{"id":"003","title":"敵意建築","category":"城市與空間","is_test":false}],"next_cursor":null,"total":1}</pre><p>上例為精簡結構示意，實際詞彙欄位包括：<code>id, title, category, life_context, summary, act1, act2, act3, primary_source_url, source_count, url, published_date, updated_at, is_test</code>；也可能包含額外來源欄位。日期為 ISO 8601；source_count 為數字，is_test 為布林值。</p>
+<h3>清單參數與分頁對應</h3><ul><li><code>limit</code>：預設 20，範圍 1–50。</li><li><code>cursor</code>：原樣傳回上一頁的 next_cursor，null 時停止。</li><li><code>category</code>：分類名稱或 categories 的 id。</li><li><code>q</code>：關鍵字，最多 200 字元。</li><li><code>updated_after</code>：只取 updated_at 嚴格晚於指定 ISO 日期／時間的資料。含時區的加號應做 URL 編碼。</li></ul><p>資料陣列路徑為 <code>$.data</code>，下一頁游標路徑為 <code>$.next_cursor</code>，下次請求參數名稱為 <code>cursor</code>。total 是篩選後、分頁前總數。改篩選條件時清除 cursor；來源更新造成 cursor_expired 時從第一頁重新讀取，並以 id 去重。清單可能包含測試資料，正式處理須自行排除 is_test=true。</p><pre>GET /api/v1/words?limit=2&amp;q=%E5%9F%8E%E5%B8%82
+Accept: application/json
+Authorization: Bearer &lt;另行提供的詞彙金鑰&gt;</pre><h3>API 錯誤</h3><pre>{"error":{"code":"unauthorized","message":"缺少或無效的驗證憑證；請擇一使用 Bearer、X-API-Key 或 Basic Auth。"}}</pre><p>401：憑證無效；400：參數或游標問題；404：資料不存在；405：方法錯誤；502：資料來源暫不可用；503：服務尚未設定完成。若收到 HTML 而非 JSON，先檢查託管入口、登入或防火牆，不要當成業務資料解析。</p>
+<h3>無憑證靜態 JSON 備案</h3><p><a href="https://tooooodayistheday-maker.github.io/what-is-this-word/api/v1/words.json">詞彙完整 JSON</a> 是公開、不分頁的快照；回傳 data、next_cursor=null、total。它不會替你執行驗證、篩選或游標分頁，這些須在平台端處理。可用於先測中文、emoji 與欄位對應。</p>
+<h3>河狸 API 為另一組獨立服務</h3><p>若也要河狸資料，請參考<a href="./api-docs.html">完整雙服務 API 文件</a>；該文件含河狸 Base URL、facts、facts/{id}、facts/latest、facts/today 與 categories，以及 request／response 範例。<strong>目前詞彙 MCP 沒有河狸工具，不能以 MCP 呼叫 facts。</strong></p></section>
+<section id="mcp"><h2>MCP 連線設定</h2><pre>顯示名稱：這個詞，是什麼？
+端點：https://workshub-word-notes-api.tooooodayistheday.chatgpt.site/mcp
+傳輸：無狀態 HTTP POST JSON-RPC 2.0
+Content-Type: application/json
+Accept: application/json, text/event-stream</pre><p>現有實作回傳 JSON，不使用持續 SSE 事件流，不簽發 MCP session ID。GET /mcp 不是查資料入口，應回 405；只有 GET 連接器無法直接使用它。平台須有 MCP 用戶端，或自行實作協定轉接。</p><p>程式宣告支援版本 <code>2026-07-28, 2025-11-25, 2025-06-18, 2025-03-26</code>，提供 server/discover 與 initialize 相容路徑。這是程式宣告，不代表每個 SDK 的每個版本皆已互通。請以對方 SDK 的協商與實測結果判定。</p><h3>驗證不能沿用 API 設定推論</h3><p>MCP 的平台入口由 Sites 處理登入與呼叫者存取檢查。REST API 的 Bearer、X-API-Key、Basic 是 /api/v1 的驗證，不是本頁承諾的 MCP 登入方式。請確認平台可完成遠端服務的授權探索、OAuth 與權杖維護；若要求 client_id 等資料，先回報實際需求。本頁不提供共用登入權杖或繞過授權憑證。</p>
+<h3>三項唯讀工具</h3><pre>search_words
+arguments: {"query":"城市","limit":5}
+query：必要，非空字串，最多 100 字元。
+limit：選填整數，預設 5，範圍 1–10。
+搜尋 title、life_context、summary；回傳 {data:[精簡詞彙],total:符合數量}。
+total 可能大於 data.length，目前無游標。
+
+get_word
+arguments: {"word_id":"003"}
+word_id：必要字串，保留前導零。應先搜尋取得 ID。
+回傳完整單筆詞彙，包含三幕正文與文章連結。
+
+random_word
+arguments: {}
+回傳隨機完整單筆詞彙。連續呼叫不保證不同。
+
+三項工具均排除 is_test=true；不提供寫入、排程或發文。</pre><h3>JSON-RPC 測試順序</h3><p>以下是請求範例；使用標準 MCP SDK 時，讓 SDK 處理初始化與協商。不同請求使用不同 id。</p><pre>{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"integration-test","version":"1.0.0"}}}
+
+{"jsonrpc":"2.0","method":"notifications/initialized"}
+
+{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}
+
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_words","arguments":{"query":"敵意建築","limit":5}}}
+
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"get_word","arguments":{"word_id":"003"}}}
+
+{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"random_word","arguments":{}}}</pre><p>若 SDK 採 server/discover，程式也有相應處理。通知回 HTTP 202。成功工具回應包含 <code>result.content</code>（text 中為 JSON 字串）、<code>result.structuredContent</code>（可直接對應欄位）及 <code>result.isError=false</code>。請勿把 content 的 JSON 字串當成已解析物件。</p><pre>{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"data\":[],\"total\":0}"}],"structuredContent":{"data":[],"total":0},"isError":false}}</pre><p>上例為「沒有搜尋結果」的示意，屬正常結果。工具失敗可能仍回 HTTP 200，但 result.isError=true，且 content 有原因；協定錯誤使用頂層 error，不能只檢查 HTTP 狀態。平台入口的 401／403 則屬登入、授權或網路層問題。</p></section>
+<section id="tests"><h2>請依這份驗收清單回報</h2><ol><li>列出平台名稱、版本與實際可用連接器。若只能 GET，先選 API，不把 URL 貼入後稱作 MCP。</li><li>先讀公開 JSON，確認 UTF-8 中文、emoji、字串 ID、數字、布林值與換行未破壞。</li><li>API：憑證擇一測試清單、單筆、隨機；limit=2 讀下一頁直到 next_cursor=null，檢查無漏筆及重複；測試錯誤金鑰 401、錯誤參數 400、缺少 ID 404。</li><li>MCP：完成正常授權與初始化；tools/list 找到三項工具；實際搜尋後用返回的 ID 讀文章，再隨機抽詞。確認工具輸出與網站連結一致。</li><li>用自然語言測試「找城市生活相關詞」「讀取找到的第一個詞」「隨機出一題，先隱藏答案」。確認是平台 AI 真正選用工具，而非模型憑記憶回答。</li><li>若 403 或授權失敗，記錄時間、方法、狀態碼與不含憑證的錯誤摘要；停止並回報，不繞過防護。</li></ol><pre>請用下列格式回覆服務擁有者：
+建議方案：API／MCP／混合／暫時無法判定
+平台實際支援能力：
+API 測試結果與證據：
+MCP 初始化、授權、工具呼叫結果與證據：
+欄位對應與分頁設定：
+還需要提供的非機密資訊：
+需要另外安全交付的憑證種類（勿列出值）：
+尚未驗證或阻礙：
+最小可行下一步：</pre></section>
+<footer><p>本頁公開且不含金鑰。資料來源：現有詞彙服務 worker/index.js、worker/word-mcp.mjs 與部署紀錄（2026-11-27）。本次文件製作未重新執行外部連線測試。</p><p><a href="./">詞彙網站</a> · <a href="./api-docs.html">完整 REST API 文件</a> · <a href="https://modelcontextprotocol.io/specification/2025-06-18/basic/transports">MCP HTTP 傳輸規格</a></p></footer>
+</main></body></html>
